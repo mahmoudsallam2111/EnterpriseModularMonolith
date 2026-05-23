@@ -2,10 +2,7 @@ using BuildingBlocks.Application.UnitOfWork;
 using BuildingBlocks.Domain;
 using BuildingBlocks.EventBus;
 using BuildingBlocks.EventBus.Outbox;
-using BuildingBlocks.Infrastructure.Persistence.Interceptors;
-using BuildingBlocks.SharedKernel;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 
 namespace BuildingBlocks.Infrastructure.Persistence;
@@ -16,7 +13,7 @@ namespace BuildingBlocks.Infrastructure.Persistence;
 /// SaveChanges path that dispatches domain events before commit and persists
 /// outbox messages alongside the aggregate change.
 /// </summary>
-public abstract class ModuleDbContext : DbContext
+public abstract class ModuleDbContext : DbContext, IUnitOfWorkCommitter
 {
     private readonly IDomainEventDispatcher _domainEventDispatcher;
     private readonly ILogger _logger;
@@ -51,6 +48,13 @@ public abstract class ModuleDbContext : DbContext
         });
 
         base.OnModelCreating(modelBuilder);
+    }
+
+    public bool HasChanges() => ChangeTracker.HasChanges();
+
+    async Task IUnitOfWorkCommitter.SaveChangesAsync(CancellationToken cancellationToken)
+    {
+        await SaveChangesAsync(cancellationToken);
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

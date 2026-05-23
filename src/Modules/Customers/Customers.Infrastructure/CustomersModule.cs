@@ -4,8 +4,6 @@ using BuildingBlocks.Application.UnitOfWork;
 using BuildingBlocks.EventBus;
 using BuildingBlocks.Infrastructure.Outbox;
 using BuildingBlocks.Infrastructure.Persistence.Interceptors;
-using BuildingBlocks.Infrastructure.UnitOfWork;
-using BuildingBlocks.UnitOfWork;
 using Customers.Application;
 using Customers.Application.Customers.Queries;
 using Customers.Contracts;
@@ -45,7 +43,6 @@ public sealed class CustomersModule : IModule
             {
                 npg.MigrationsHistoryTable("__ef_migrations_history", CustomersDbContext.SchemaName);
                 npg.MigrationsAssembly(typeof(CustomersDbContext).Assembly.FullName);
-                npg.EnableRetryOnFailure(3);
             });
             options.UseSnakeCaseNamingConvention();
             options.AddInterceptors(
@@ -58,8 +55,8 @@ public sealed class CustomersModule : IModule
         services.TryAddScoped<SoftDeleteInterceptor>();
         services.AddScoped<OutboxInterceptor>();
 
-        // UoW factory bound to this module's DbContext
-        services.AddScoped<IUnitOfWorkFactory, EfCoreUnitOfWorkFactory<CustomersDbContext>>();
+        // Register this module's DbContext as a committer for the UoW pipeline behavior
+        services.AddScoped<IUnitOfWorkCommitter>(sp => sp.GetRequiredService<CustomersDbContext>());
 
         // Repositories
         services.AddScoped<ICustomerRepository, CustomerRepository>();

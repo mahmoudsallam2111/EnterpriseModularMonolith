@@ -3,8 +3,7 @@ using BuildingBlocks.Application.Modules;
 using BuildingBlocks.EventBus;
 using BuildingBlocks.Infrastructure.Outbox;
 using BuildingBlocks.Infrastructure.Persistence.Interceptors;
-using BuildingBlocks.Infrastructure.UnitOfWork;
-using BuildingBlocks.UnitOfWork;
+using BuildingBlocks.Application.UnitOfWork;
 using Customers.IntegrationEvents;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -41,7 +40,6 @@ public sealed class OrdersModule : IModule
             {
                 npg.MigrationsHistoryTable("__ef_migrations_history", OrdersDbContext.SchemaName);
                 npg.MigrationsAssembly(typeof(OrdersDbContext).Assembly.FullName);
-                npg.EnableRetryOnFailure(3);
             });
             options.UseSnakeCaseNamingConvention();
             options.AddInterceptors(
@@ -54,7 +52,8 @@ public sealed class OrdersModule : IModule
         services.TryAddScoped<SoftDeleteInterceptor>();
         services.AddScoped<OutboxInterceptor>();
 
-        services.AddScoped<IUnitOfWorkFactory, EfCoreUnitOfWorkFactory<OrdersDbContext>>();
+        // Register this module's DbContext as a committer for the UoW pipeline behavior
+        services.AddScoped<IUnitOfWorkCommitter>(sp => sp.GetRequiredService<OrdersDbContext>());
 
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IOrderReadModel, OrderReadModel>();

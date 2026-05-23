@@ -5,16 +5,16 @@ using MediatR;
 namespace BuildingBlocks.Application.Behaviors;
 
 /// <summary>
-/// Wraps every command in an ambient Unit of Work. Queries are not wrapped — they're
-/// expected to be read-only and use no-tracking projections.
-/// Nested UoWs participate in the outer transaction (see <see cref="IUnitOfWorkManager"/>).
+/// Wraps every command in an implicit save. After the handler runs, any registered
+/// <see cref="IUnitOfWorkCommitter"/> that has pending changes gets saved.
+/// Queries are not wrapped — they're expected to be read-only and use no-tracking projections.
 /// </summary>
 public sealed class UnitOfWorkBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull
 {
-    private readonly IUnitOfWorkManager _uowManager;
+    private readonly IEnumerable<IUnitOfWorkCommitter> _committers;
 
-    public UnitOfWorkBehavior(IUnitOfWorkManager uowManager) => _uowManager = uowManager;
+    public UnitOfWorkBehavior(IEnumerable<IUnitOfWorkCommitter> committers) => _committers = committers;
 
     public async Task<TResponse> Handle(
         TRequest request,
@@ -24,9 +24,17 @@ public sealed class UnitOfWorkBehavior<TRequest, TResponse> : IPipelineBehavior<
         if (!IsCommand())
             return await next();
 
-        await using var uow = _uowManager.Begin();
         var response = await next();
-        await uow.CompleteAsync(cancellationToken);
+
+        // Save changes on every module DbContext that has pending modifications.
+        foreach (var committer in _committers)
+        {
+            if (committer.HasChanges())
+            {
+                await committer.SaveChangesAsync(cancellationToken);
+            }
+        }
+
         return response;
     }
 

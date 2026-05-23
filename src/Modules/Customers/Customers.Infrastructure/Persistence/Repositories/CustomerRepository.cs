@@ -10,5 +10,5 @@ internal sealed class CustomerRepository
     public CustomerRepository(CustomersDbContext context) : base(context) { }
 
     public Task<bool> ExistsByEmailAsync(Email email, CancellationToken cancellationToken = default) =>
-        Context.Customers.AnyAsync(c => c.Email == email, cancellationToken);
+        Context.Customers.AnyAsync(c => c.Email.Value == email.Value, cancellationToken);
 }
