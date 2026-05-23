@@ -36,4 +36,5 @@ public sealed class EmmWebApplicationFactory : WebApplicationFactory<Program>, I
     }
 
     public Task InitializeAsync() => _postgres.StartAsync();
-    public new Task DisposeAsync() => _postgres.DisposeAsync()
+    public new Task DisposeAsync() => _postgres.DisposeAsync().AsTask();
+}

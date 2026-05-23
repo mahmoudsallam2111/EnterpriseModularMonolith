@@ -37,21 +37,20 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
         b.Property(u => u.IsDeleted);
         b.HasQueryFilter(u => !u.IsDeleted);
 
-        // RoleIds as a join table
-        b.OwnsMany<RoleAssignment>("RoleAssignments", a =>
-        {
-            a.ToTable("user_roles");
-            a.WithOwner().HasForeignKey("user_id");
-            a.HasKey("user_id", "role_id");
-            a.Property<Guid>("role_id");
-        });
+        // RoleIds mapped as a primitive array column
+        b.Property(u => u.RoleIds)
+            .HasConversion(
+                v => v.Select(r => r.Value).ToArray(),
+                v => new HashSet<RoleId>(v.Select(g => new RoleId(g)))
+            )
+            .HasColumnName("role_ids")
+            .HasColumnType("uuid[]")
+            .HasField("_roleIds")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
 
         b.Ignore(u => u.DomainEvents);
-        b.Ignore(u => u.RoleIds);
     }
 }
-
-internal sealed class RoleAssignment { /* shadow type to map join table */ }
 
 internal sealed class RoleConfiguration : IEntityTypeConfiguration<Role>
 {

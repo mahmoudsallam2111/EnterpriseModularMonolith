@@ -37,7 +37,6 @@ try
 
     // ── OpenAPI ─────────────────────────────────────────────────────────────
     builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddOpenApi();
     builder.Services.AddSwaggerGen(o =>
     {
         o.SwaggerDoc("v1", new() { Title = "Enterprise Modular Monolith", Version = "v1" });

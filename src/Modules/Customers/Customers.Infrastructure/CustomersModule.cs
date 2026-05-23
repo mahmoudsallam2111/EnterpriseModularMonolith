@@ -54,8 +54,8 @@ public sealed class CustomersModule : IModule
                 sp.GetRequiredService<OutboxInterceptor>());
         });
 
-        services.TryAddSingleton<AuditingInterceptor>();
-        services.TryAddSingleton<SoftDeleteInterceptor>();
+        services.TryAddScoped<AuditingInterceptor>();
+        services.TryAddScoped<SoftDeleteInterceptor>();
         services.AddScoped<OutboxInterceptor>();
 
         // UoW factory bound to this module's DbContext

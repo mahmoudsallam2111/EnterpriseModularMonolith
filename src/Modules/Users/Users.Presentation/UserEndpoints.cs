@@ -59,6 +59,6 @@ public sealed class UserEndpoints : IModuleEndpoints
     private static async Task<IResult> AssignRoleAsync(
         Guid id, AssignRoleBody body, ISender mediator, CancellationToken cancellationToken) =>
         (await mediator.Send(new AssignRoleCommand(id, body.RoleId), cancellationToken)).ToHttpResult();
-
-    public sealed record AssignRoleBody(Guid RoleId);
 }
+
+public sealed record AssignRoleBody(Guid RoleId);

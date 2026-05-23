@@ -50,8 +50,8 @@ public sealed class UsersModule : IModule
                 sp.GetRequiredService<OutboxInterceptor>());
         });
 
-        services.TryAddSingleton<AuditingInterceptor>();
-        services.TryAddSingleton<SoftDeleteInterceptor>();
+        services.TryAddScoped<AuditingInterceptor>();
+        services.TryAddScoped<SoftDeleteInterceptor>();
         services.AddScoped<OutboxInterceptor>();
 
         services.AddScoped<IUnitOfWorkFactory, EfCoreUnitOfWorkFactory<UsersDbContext>>();

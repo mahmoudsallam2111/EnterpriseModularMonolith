@@ -12,7 +12,7 @@ public class HealthEndpointTests : IClassFixture<EmmWebApplicationFactory>
     public async Task Health_endpoint_returns_OK()
     {
         var client = _factory.CreateClient();
-        var response = await client.GetAsync("/health");
+        var response = await client.GetAsync(new Uri("/health", UriKind.Relative));
         response.IsSuccessStatusCode.Should().BeTrue();
     }
 }

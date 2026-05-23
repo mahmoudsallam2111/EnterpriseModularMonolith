@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="Serilog" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
   </ItemGroup>
 
   <ItemGroup>

@@ -41,6 +41,6 @@ public sealed class OrderEndpoints : IModuleEndpoints
     private static async Task<IResult> CancelAsync(
         Guid id, CancelBody body, ISender mediator, CancellationToken cancellationToken) =>
         (await mediator.Send(new CancelOrderCommand(id, body.Reason), cancellationToken)).ToHttpResult();
-
-    public sealed record CancelBody(string Reason);
 }
+
+public sealed record CancelBody(string Reason);

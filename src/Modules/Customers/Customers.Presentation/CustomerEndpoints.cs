@@ -69,7 +69,7 @@ public sealed class CustomerEndpoints : IModuleEndpoints
     private static async Task<IResult> DeactivateAsync(
         Guid id, DeactivateBody body, ISender mediator, CancellationToken cancellationToken) =>
         (await mediator.Send(new DeactivateCustomerCommand(id, body.Reason), cancellationToken)).ToHttpResult();
-
-    public sealed record ChangeEmailBody(string NewEmail);
-    public sealed record DeactivateBody(string Reason);
 }
+
+public sealed record ChangeEmailBody(string NewEmail);
+public sealed record DeactivateBody(string Reason);
