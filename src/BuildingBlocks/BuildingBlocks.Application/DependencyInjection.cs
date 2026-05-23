@@ -19,13 +19,13 @@ public static class DependencyInjection
 
         services.TryAddSingleton<IUnitOfWorkAccessor, NullUnitOfWorkAccessor>();
 
-        // Order matters: outermost first.
+        // Order matters: first registered is outermost.
         services.TryAddEnumerable(ServiceDescriptor.Transient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>)));
         services.TryAddEnumerable(ServiceDescriptor.Transient(typeof(IPipelineBehavior<,>), typeof(TracingBehavior<,>)));
-        services.TryAddEnumerable(ServiceDescriptor.Transient(typeof(IPipelineBehavior<,>), typeof(AuthorizationBehavior<,>)));
+       // services.TryAddEnumerable(ServiceDescriptor.Transient(typeof(IPipelineBehavior<,>), typeof(AuthorizationBehavior<,>)));
         services.TryAddEnumerable(ServiceDescriptor.Transient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>)));
 
-        // will be in the module level , but now I make it in the request-scoped i.e enable the UOW Middleware all module level
+        // Unit of work is now handled by request-scoped middleware.
         //services.TryAddEnumerable(ServiceDescriptor.Transient(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehavior<,>)));
 
         services.AddValidatorsFromAssemblies(assemblies, includeInternalTypes: true);
