@@ -1,0 +1,34 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{json,yml,yaml,xml,csproj,props,targets}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.cs]
+csharp_style_namespace_declarations = file_scoped:warning
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_expression_bodied_methods = when_on_single_line:suggestion
+csharp_style_expression_bodied_constructors = when_on_single_line:suggestion
+csharp_style_expression_bodied_properties = when_on_single_line:suggestion
+csharp_prefer_simple_using_statement = true:suggestion
+dotnet_sort_system_directives_first = true
+dotnet_style_qualification_for_field = false:warning
+dotnet_style_qualification_for_property = false:warning
+dotnet_style_qualification_for_method = false:warning
+dotnet_style_predefined_type_for_locals_parameters_members = true:warning
+dotnet_style_readonly_field = true:warning
+dotnet_diagnostic.CA1062.severity = none
+dotnet_diagnostic.CA1812.severity = none
+dotnet_diagnostic.CA1848.severity = none
+dotnet_diagnostic.CA2007.severity = none
+dotnet_diagnostic.CA1515.severity = none

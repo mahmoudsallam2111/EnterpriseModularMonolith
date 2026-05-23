@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="NetArchTest.Rules" />
+    <PackageReference Include="coverlet.collector" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Reference every domain/application/infrastructure assembly so we can inspect them. -->
+    <ProjectReference Include="..\..\src\BuildingBlocks\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
+    <ProjectReference Include="..\..\src\BuildingBlocks\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
+    <ProjectReference Include="..\..\src\BuildingBlocks\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
+
+    <ProjectReference Include="..\..\src\Modules\Customers\Customers.Domain\Customers.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Customers\Customers.Application\Customers.Application.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Customers\Customers.Infrastructure\Customers.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Customers\Customers.Contracts\Customers.Contracts.csproj" />
+
+    <ProjectReference Include="..\..\src\Modules\Orders\Orders.Domain\Orders.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Orders\Orders.Application\Orders.Application.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Orders\Orders.Infrastructure\Orders.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Orders\Orders.Contracts\Orders.Contracts.csproj" />
+
+    <ProjectReference Include="..\..\src\Modules\Users\Users.Domain\Users.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Users\Users.Application\Users.Application.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Users\Users.Infrastructure\Users.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Users\Users.Contracts\Users.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <UserSecretsId>emm-host-secrets</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Microsoft.FeatureManagement.AspNetCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Swashbuckle.AspNetCore" />
+    <PackageReference Include="Scalar.AspNetCore" />
+    <PackageReference Include="Serilog" />
+    <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="Microsoft.OpenApi" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.SharedKernel\BuildingBlocks.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
+    <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
+    <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.UnitOfWork\BuildingBlocks.UnitOfWork.csproj" />
+    <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.EventBus\BuildingBlocks.EventBus.csproj" />
+    <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.MultiTenancy\BuildingBlocks.MultiTenancy.csproj" />
+    <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Observability\BuildingBlocks.Observability.csproj" />
+    <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Presentation\BuildingBlocks.Presentation.csproj" />
+
+    <!-- Host references infrastructure + presentation of every module. -->
+    <ProjectReference Include="..\..\Modules\Customers\Customers.Infrastructure\Customers.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Modules\Customers\Customers.Presentation\Customers.Presentation.csproj" />
+    <ProjectReference Include="..\..\Modules\Orders\Orders.Infrastructure\Orders.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Modules\Orders\Orders.Presentation\Orders.Presentation.csproj" />
+    <ProjectReference Include="..\..\Modules\Users\Users.Infrastructure\Users.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Modules\Users\Users.Presentation\Users.Presentation.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="MediatR" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Presentation\BuildingBlocks.Presentation.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.SharedKernel\BuildingBlocks.SharedKernel.csproj" />
+    <ProjectReference Include="..\Users.Application\Users.Application.csproj" />
+  </ItemGroup>
+
+</Project>

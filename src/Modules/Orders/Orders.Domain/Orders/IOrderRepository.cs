@@ -1,0 +1,9 @@
+using BuildingBlocks.Application.Persistence;
+
+namespace Orders.Domain.Orders;
+
+public interface IOrderRepository : IWriteRepository<Order, OrderId>
+{
+    /// <summary>Load with lines included — call this when you intend to mutate the order.</summary>
+    Task<Order?> GetWithLinesAsync(OrderId id, CancellationToken cancellationToken = default);
+}

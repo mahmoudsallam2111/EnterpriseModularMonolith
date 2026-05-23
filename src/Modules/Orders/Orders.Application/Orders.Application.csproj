@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" />
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.SharedKernel\BuildingBlocks.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.EventBus\BuildingBlocks.EventBus.csproj" />
+    <ProjectReference Include="..\Orders.Domain\Orders.Domain.csproj" />
+    <ProjectReference Include="..\Orders.Contracts\Orders.Contracts.csproj" />
+    <ProjectReference Include="..\Orders.IntegrationEvents\Orders.IntegrationEvents.csproj" />
+    <!-- Orders consumes Customers ONLY through its Contracts assembly. -->
+    <ProjectReference Include="..\..\Customers\Customers.Contracts\Customers.Contracts.csproj" />
+    <ProjectReference Include="..\..\Customers\Customers.IntegrationEvents\Customers.IntegrationEvents.csproj" />
+  </ItemGroup>
+
+</Project>

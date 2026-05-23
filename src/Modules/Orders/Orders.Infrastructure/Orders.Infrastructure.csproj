@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="EFCore.NamingConventions" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.UnitOfWork\BuildingBlocks.UnitOfWork.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.EventBus\BuildingBlocks.EventBus.csproj" />
+    <ProjectReference Include="..\Orders.Domain\Orders.Domain.csproj" />
+    <ProjectReference Include="..\Orders.Application\Orders.Application.csproj" />
+    <ProjectReference Include="..\Orders.Contracts\Orders.Contracts.csproj" />
+    <!-- Orders consumes Customers ONLY through its Contracts assembly. -->
+    <ProjectReference Include="..\..\Customers\Customers.Contracts\Customers.Contracts.csproj" />
+    <ProjectReference Include="..\..\Customers\Customers.IntegrationEvents\Customers.IntegrationEvents.csproj" />
+  </ItemGroup>
+
+</Project>

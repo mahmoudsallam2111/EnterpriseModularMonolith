@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
+    <PackageReference Include="Microsoft.FeatureManagement.AspNetCore" />
+    <PackageReference Include="Polly" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BuildingBlocks.SharedKernel\BuildingBlocks.SharedKernel.csproj" />
+    <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
+    <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
+    <ProjectReference Include="..\BuildingBlocks.EventBus\BuildingBlocks.EventBus.csproj" />
+    <ProjectReference Include="..\BuildingBlocks.UnitOfWork\BuildingBlocks.UnitOfWork.csproj" />
+    <ProjectReference Include="..\BuildingBlocks.MultiTenancy\BuildingBlocks.MultiTenancy.csproj" />
+  </ItemGroup>
+
+</Project>

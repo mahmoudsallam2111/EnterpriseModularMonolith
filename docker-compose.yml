@@ -1,0 +1,52 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: emm-postgres
+    environment:
+      POSTGRES_USER: emm
+      POSTGRES_PASSWORD: emm
+      POSTGRES_DB: emm
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U emm -d emm"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  seq:
+    image: datalust/seq:latest
+    container_name: emm-seq
+    environment:
+      ACCEPT_EULA: "Y"
+    ports:
+      - "5341:80"
+    volumes:
+      - seq-data:/data
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: emm-jaeger
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16686:16686"   # UI
+      - "4317:4317"     # OTLP gRPC
+      - "4318:4318"     # OTLP HTTP
+
+  redis:
+    image: redis:7-alpine
+    container_name: emm-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres-data:
+  seq-data:
