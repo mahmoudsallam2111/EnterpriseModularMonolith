@@ -5,8 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Orders.Infrastructure.Persistence;
-using Users.Infrastructure.Persistence;
-using Users.Infrastructure.Seeding;
 
 namespace EnterpriseModularMonolith.Api.Composition;
 
@@ -24,9 +22,8 @@ internal static class MigrationsAndSeed
         // Register seeders here (host owns wiring — modules just provide the classes).
         var customersDb = scope.ServiceProvider.GetRequiredService<CustomersDbContext>();
         var ordersDb = scope.ServiceProvider.GetRequiredService<OrdersDbContext>();
-        var usersDb = scope.ServiceProvider.GetRequiredService<UsersDbContext>();
 
-        foreach (var db in new DbContext[] { usersDb, customersDb, ordersDb })
+        foreach (var db in new DbContext[] { customersDb, ordersDb })
         {
             logger.LogInformation("Applying migrations for {Context}", db.GetType().Name);
             await db.Database.MigrateAsync(cancellationToken);
@@ -34,7 +31,6 @@ internal static class MigrationsAndSeed
 
         var seeders = new IDataSeeder[]
         {
-            new UsersSeeder(usersDb, scope.ServiceProvider.GetRequiredService<Users.Domain.Users.IPasswordHasher>()),
             new CustomersSeeder(customersDb),
         }.OrderBy(s => s.Order);
 

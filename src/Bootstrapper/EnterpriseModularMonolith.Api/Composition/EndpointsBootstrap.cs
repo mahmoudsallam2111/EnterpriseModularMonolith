@@ -2,7 +2,7 @@ using BuildingBlocks.Presentation.Endpoints;
 using Customers.Presentation;
 using Orders.Presentation;
 using Microsoft.AspNetCore.Routing;
-using Users.Presentation;
+using Inventories.Presentation;
 
 namespace EnterpriseModularMonolith.Api.Composition;
 
@@ -10,9 +10,9 @@ internal static class EndpointsBootstrap
 {
     private static readonly IModuleEndpoints[] AllEndpoints =
     {
-        new UserEndpoints(),
         new CustomerEndpoints(),
         new OrderEndpoints(),
+        new InventoryEndpoints(),
     };
 
     public static IEndpointRouteBuilder MapModuleEndpoints(this IEndpointRouteBuilder endpoints)

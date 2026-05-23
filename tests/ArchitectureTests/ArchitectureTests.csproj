@@ -28,11 +28,6 @@
     <ProjectReference Include="..\..\src\Modules\Orders\Orders.Application\Orders.Application.csproj" />
     <ProjectReference Include="..\..\src\Modules\Orders\Orders.Infrastructure\Orders.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\Modules\Orders\Orders.Contracts\Orders.Contracts.csproj" />
-
-    <ProjectReference Include="..\..\src\Modules\Users\Users.Domain\Users.Domain.csproj" />
-    <ProjectReference Include="..\..\src\Modules\Users\Users.Application\Users.Application.csproj" />
-    <ProjectReference Include="..\..\src\Modules\Users\Users.Infrastructure\Users.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\src\Modules\Users\Users.Contracts\Users.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

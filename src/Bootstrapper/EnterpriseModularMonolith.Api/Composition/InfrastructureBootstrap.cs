@@ -30,6 +30,7 @@ internal static class InfrastructureBootstrap
         services.AddHttpContextAccessor();
         services.AddSingleton<IClock, SystemClock>();
         services.AddScoped<ICurrentUser, HttpContextCurrentUser>();
+        services.AddScoped<BuildingBlocks.Application.Authorization.IPermissionService, DummyPermissionService>();
         services.AddSingleton<ITenantContext, NullTenantContext>();
 
         // Caching

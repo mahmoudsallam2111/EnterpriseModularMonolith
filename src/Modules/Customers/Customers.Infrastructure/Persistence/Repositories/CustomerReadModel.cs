@@ -15,18 +15,24 @@ internal sealed class CustomerReadModel : ICustomerReadModel
     private readonly CustomersDbContext _context;
     public CustomerReadModel(CustomersDbContext context) => _context = context;
 
-    public Task<CustomerDetailsDto?> GetByIdAsync(Guid customerId, CancellationToken cancellationToken) =>
-        _context.Customers
+    public async Task<CustomerDetailsDto?> GetByIdAsync(Guid customerId, CancellationToken cancellationToken)
+    {
+        var targetId = Domain.Customers.CustomerId.From(customerId);
+        var customer = await _context.Customers
             .AsNoTracking()
-            .Where(c => c.Id.Value == customerId)
-            .Select(c => new CustomerDetailsDto(
-                c.Id.Value,
-                c.Name.First,
-                c.Name.Last,
-                c.Email.Value,
-                c.Status.ToString(),
-                c.CreatedAt))
+            .Where(c => c.Id == targetId)
             .FirstOrDefaultAsync(cancellationToken);
+
+        if (customer is null) return null;
+
+        return new CustomerDetailsDto(
+            customer.Id.Value,
+            customer.Name.First,
+            customer.Name.Last,
+            customer.Email.Value,
+            customer.Status.ToString(),
+            customer.CreatedAt);
+    }
 
     public async Task<PagedList<CustomerDetailsDto>> ListAsync(
         string? search, string? status, PageRequest page, CancellationToken cancellationToken)
@@ -53,15 +59,17 @@ internal sealed class CustomerReadModel : ICustomerReadModel
             .OrderByDescending(c => c.CreatedAt)
             .Skip(page.Skip)
             .Take(page.Take)
-            .Select(c => new CustomerDetailsDto(
+            .ToListAsync(cancellationToken);
+
+        var dtos = items.Select(c => new CustomerDetailsDto(
                 c.Id.Value,
                 c.Name.First,
                 c.Name.Last,
                 c.Email.Value,
                 c.Status.ToString(),
                 c.CreatedAt))
-            .ToListAsync(cancellationToken);
+            .ToList();
 
-        return new PagedList<CustomerDetailsDto>(items, page.Page, page.Take, total);
+        return new PagedList<CustomerDetailsDto>(dtos, page.Page, page.Take, total);
     }
 }

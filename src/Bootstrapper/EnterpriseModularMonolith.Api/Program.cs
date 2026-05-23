@@ -32,8 +32,7 @@ try
     // ── Health checks ───────────────────────────────────────────────────────
     builder.Services.AddHealthChecks()
         .AddDbContextCheck<Customers.Infrastructure.Persistence.CustomersDbContext>("customers-db")
-        .AddDbContextCheck<Orders.Infrastructure.Persistence.OrdersDbContext>("orders-db")
-        .AddDbContextCheck<Users.Infrastructure.Persistence.UsersDbContext>("users-db");
+        .AddDbContextCheck<Orders.Infrastructure.Persistence.OrdersDbContext>("orders-db");
 
     // ── OpenAPI ─────────────────────────────────────────────────────────────
     builder.Services.AddEndpointsApiExplorer();
@@ -95,6 +94,11 @@ try
     });
 
     app.MapModuleEndpoints();
+
+    if (app.Environment.IsDevelopment()) // for testing
+    {
+        app.MapDevAuthEndpoints(builder.Configuration);
+    }
 
     // ── Migrate + seed ────────────────────────────────────────────────────
     if (builder.Configuration.GetValue<bool>("Migrations:RunOnStartup"))

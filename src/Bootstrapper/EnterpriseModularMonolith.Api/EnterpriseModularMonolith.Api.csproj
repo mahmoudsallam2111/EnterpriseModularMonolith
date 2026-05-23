@@ -9,6 +9,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <PackageReference Include="Microsoft.FeatureManagement.AspNetCore" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
     <PackageReference Include="Swashbuckle.AspNetCore" />
     <PackageReference Include="Scalar.AspNetCore" />
@@ -34,8 +35,8 @@
     <ProjectReference Include="..\..\Modules\Customers\Customers.Presentation\Customers.Presentation.csproj" />
     <ProjectReference Include="..\..\Modules\Orders\Orders.Infrastructure\Orders.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Modules\Orders\Orders.Presentation\Orders.Presentation.csproj" />
-    <ProjectReference Include="..\..\Modules\Users\Users.Infrastructure\Users.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\Modules\Users\Users.Presentation\Users.Presentation.csproj" />
+    <ProjectReference Include="..\..\Modules\Inventories\Inventories.Infrastructure\Inventories.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Modules\Inventories\Inventories.Presentation\Inventories.Presentation.csproj" />
   </ItemGroup>
 
 </Project>

@@ -38,6 +38,7 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.10" />
     <PackageVersion Include="EFCore.NamingConventions" Version="8.0.3" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.10" />
   </ItemGroup>
 
   <ItemGroup Label="CQRS / Validation">

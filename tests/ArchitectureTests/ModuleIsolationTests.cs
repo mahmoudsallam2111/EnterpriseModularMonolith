@@ -5,9 +5,7 @@ using Xunit;
 namespace ArchitectureTests;
 
 /// <summary>
-/// Enforces the "modules don't touch each other's internals" rule. Modules may
-/// communicate only via Contracts / IntegrationEvents / public APIs — referencing
-/// another module's Domain/Application/Infrastructure assembly fails the build.
+/// Enforces the "modules don't touch each other's internals" rule.
 /// </summary>
 public sealed class ModuleIsolationTests
 {
@@ -19,14 +17,9 @@ public sealed class ModuleIsolationTests
     private const string OrdersApp = "Orders.Application";
     private const string OrdersInfra = "Orders.Infrastructure";
 
-    private const string UsersDomain = "Users.Domain";
-    private const string UsersApp = "Users.Application";
-    private const string UsersInfra = "Users.Infrastructure";
-
     [Theory]
-    [InlineData(typeof(Customers.Domain.Customers.Customer), OrdersDomain, OrdersApp, OrdersInfra, UsersDomain, UsersApp, UsersInfra)]
-    [InlineData(typeof(Orders.Domain.Orders.Order), CustomersDomain, CustomersApp, CustomersInfra, UsersDomain, UsersApp, UsersInfra)]
-    [InlineData(typeof(Users.Domain.Users.User), CustomersDomain, CustomersApp, CustomersInfra, OrdersDomain, OrdersApp, OrdersInfra)]
+    [InlineData(typeof(Customers.Domain.Customers.Customer), OrdersDomain, OrdersApp, OrdersInfra)]
+    [InlineData(typeof(Orders.Domain.Orders.Order), CustomersDomain, CustomersApp, CustomersInfra)]
     public void Domain_should_not_depend_on_any_other_module(Type marker, params string[] forbidden)
     {
         var assembly = marker.Assembly;
@@ -41,9 +34,8 @@ public sealed class ModuleIsolationTests
     }
 
     [Theory]
-    [InlineData(typeof(Customers.Application.CustomerPermissions), OrdersDomain, OrdersInfra, UsersDomain, UsersInfra)]
-    [InlineData(typeof(Orders.Application.OrderPermissions), CustomersDomain, CustomersInfra, UsersDomain, UsersInfra)]
-    [InlineData(typeof(Users.Application.UserPermissions), CustomersDomain, CustomersInfra, OrdersDomain, OrdersInfra)]
+    [InlineData(typeof(Customers.Application.CustomerPermissions), OrdersDomain, OrdersInfra)]
+    [InlineData(typeof(Orders.Application.OrderPermissions), CustomersDomain, CustomersInfra)]
     public void Application_can_consume_contracts_and_integration_events_but_not_other_modules_domain_or_infra(
         Type marker, params string[] forbidden)
     {
@@ -65,7 +57,6 @@ public sealed class ModuleIsolationTests
         {
             typeof(Customers.Domain.Customers.Customer).Assembly,
             typeof(Orders.Domain.Orders.Order).Assembly,
-            typeof(Users.Domain.Users.User).Assembly,
             typeof(BuildingBlocks.Domain.Entity<>).Assembly,
         };
 
@@ -93,7 +84,6 @@ public sealed class ModuleIsolationTests
         {
             typeof(Customers.Application.CustomerPermissions).Assembly,
             typeof(Orders.Application.OrderPermissions).Assembly,
-            typeof(Users.Application.UserPermissions).Assembly,
             typeof(BuildingBlocks.Application.Cqrs.ICommand).Assembly,
         };
 
@@ -117,7 +107,6 @@ public sealed class ModuleIsolationTests
         {
             typeof(Customers.Contracts.ICustomersApi).Assembly,
             typeof(Orders.Contracts.IOrdersApi).Assembly,
-            typeof(Users.Contracts.IUsersApi).Assembly,
         };
 
         foreach (var asm in contracts)

@@ -13,8 +13,6 @@ public sealed class CleanArchitectureTests
         {
             typeof(Customers.Domain.Customers.Customer),
             typeof(Orders.Domain.Orders.Order),
-            typeof(Users.Domain.Users.User),
-            typeof(Users.Domain.Users.Role),
         };
 
         foreach (var t in aggregateRoots)
@@ -28,7 +26,6 @@ public sealed class CleanArchitectureTests
         {
             typeof(Customers.Domain.Customers.Customer).Assembly,
             typeof(Orders.Domain.Orders.Order).Assembly,
-            typeof(Users.Domain.Users.User).Assembly,
         };
 
         foreach (var asm in assemblies)
@@ -53,7 +50,6 @@ public sealed class CleanArchitectureTests
         {
             typeof(Customers.Application.CustomerPermissions).Assembly,
             typeof(Orders.Application.OrderPermissions).Assembly,
-            typeof(Users.Application.UserPermissions).Assembly,
         };
 
         foreach (var asm in assemblies)
