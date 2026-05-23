@@ -5,6 +5,8 @@ using BuildingBlocks.Application.Locking;
 using BuildingBlocks.Application.Security;
 using BuildingBlocks.EventBus;
 using BuildingBlocks.EventBus.InProcess;
+using BuildingBlocks.Infrastructure.Persistence;
+using BuildingBlocks.Infrastructure.UnitOfWork;
 using BuildingBlocks.Infrastructure.Auditing;
 using BuildingBlocks.Infrastructure.Caching;
 using BuildingBlocks.Infrastructure.FeatureFlags;
@@ -48,7 +50,11 @@ internal static class InfrastructureBootstrap
         services.AddScoped<IAuditLogger, LoggerAuditLogger>();
 
         // Ambient Unit of Work
+        var connectionString = configuration.GetConnectionString("Postgres")
+            ?? throw new InvalidOperationException("Missing connection string 'Postgres'.");
+        services.AddScoped(_ => new SharedModuleDbConnection(connectionString));
         services.AddAmbientUnitOfWork();
+        services.AddScoped<IUnitOfWorkFactory, EfCoreUnitOfWorkFactory>();
 
         // Event bus + dispatcher
         services.AddScoped<IDomainEventDispatcher, MediatRDomainEventDispatcher>();

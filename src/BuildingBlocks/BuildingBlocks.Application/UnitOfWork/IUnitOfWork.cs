@@ -45,4 +45,7 @@ public interface IUnitOfWorkAccessor
 public interface IUnitOfWorkManager : IUnitOfWorkAccessor
 {
     IUnitOfWork Begin(UnitOfWorkOptions? options = null);
+    Task<IUnitOfWork> BeginAsync(
+        UnitOfWorkOptions? options = null,
+        CancellationToken cancellationToken = default);
 }

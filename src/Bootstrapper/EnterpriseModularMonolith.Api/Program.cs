@@ -78,6 +78,7 @@ try
 
     app.UseAuthentication();
     app.UseAuthorization();
+    app.UseMiddleware<UnitOfWorkMiddleware>();
 
     // ── Endpoints ─────────────────────────────────────────────────────────
     app.MapHealthChecks("/health", new HealthCheckOptions

@@ -1,5 +1,5 @@
-using System.Data;
 using BuildingBlocks.Application.UnitOfWork;
+using BuildingBlocks.Infrastructure.Persistence;
 using BuildingBlocks.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -8,27 +8,31 @@ using Microsoft.Extensions.Logging;
 namespace BuildingBlocks.Infrastructure.UnitOfWork;
 
 /// <summary>
-/// Root UoW backed by an EF Core transaction. Wires SaveChanges + Commit + post-commit callbacks
-/// (used by the outbox processor / integration event dispatch).
+/// Request-scoped EF Core unit of work shared by every module DbContext in the scope.
+/// All module contexts enlist in one database transaction and commit together.
 /// </summary>
-public sealed class EfCoreUnitOfWork<TDbContext> : IUnitOfWork
-    where TDbContext : DbContext
+public sealed class EfCoreUnitOfWork : IUnitOfWork
 {
-    private readonly TDbContext _db;
+    private const int MaxSavePasses = 8;
+
+    private readonly IReadOnlyList<IUnitOfWorkCommitter> _committers;
+    private readonly IReadOnlyList<ModuleDbContext> _contexts;
     private readonly AmbientUnitOfWorkAccessor _accessor;
-    private readonly ILogger<EfCoreUnitOfWork<TDbContext>> _logger;
+    private readonly ILogger<EfCoreUnitOfWork> _logger;
     private readonly List<Func<CancellationToken, Task>> _onCompleted = [];
     private IDbContextTransaction? _transaction;
     private bool _disposed;
 
-    public EfCoreUnitOfWork(
-        TDbContext db,
+    private EfCoreUnitOfWork(
+        IReadOnlyList<IUnitOfWorkCommitter> committers,
+        IReadOnlyList<ModuleDbContext> contexts,
         UnitOfWorkOptions options,
         AmbientUnitOfWorkAccessor accessor,
         IUnitOfWork? outer,
-        ILogger<EfCoreUnitOfWork<TDbContext>> logger)
+        ILogger<EfCoreUnitOfWork> logger)
     {
-        _db = db;
+        _committers = committers;
+        _contexts = contexts;
         Options = options;
         Outer = outer;
         _accessor = accessor;
@@ -41,31 +45,60 @@ public sealed class EfCoreUnitOfWork<TDbContext> : IUnitOfWork
     public bool IsRolledBack { get; private set; }
     public IUnitOfWork? Outer { get; }
 
+    public static EfCoreUnitOfWork Begin(
+        IReadOnlyList<IUnitOfWorkCommitter> committers,
+        UnitOfWorkOptions options,
+        AmbientUnitOfWorkAccessor accessor,
+        IUnitOfWork? outer,
+        ILogger<EfCoreUnitOfWork> logger)
+    {
+        var contexts = GetModuleContexts(committers);
+        var unitOfWork = new EfCoreUnitOfWork(committers, contexts, options, accessor, outer, logger);
+        unitOfWork.BeginTransaction();
+        return unitOfWork;
+    }
+
+    public static async Task<EfCoreUnitOfWork> BeginAsync(
+        IReadOnlyList<IUnitOfWorkCommitter> committers,
+        UnitOfWorkOptions options,
+        AmbientUnitOfWorkAccessor accessor,
+        IUnitOfWork? outer,
+        ILogger<EfCoreUnitOfWork> logger,
+        CancellationToken cancellationToken)
+    {
+        var contexts = GetModuleContexts(committers);
+        var unitOfWork = new EfCoreUnitOfWork(committers, contexts, options, accessor, outer, logger);
+        await unitOfWork.BeginTransactionAsync(cancellationToken);
+        return unitOfWork;
+    }
+
     public void OnCompleted(Func<CancellationToken, Task> callback) => _onCompleted.Add(callback);
 
     public async Task CompleteAsync(CancellationToken cancellationToken = default)
     {
         if (IsCompleted) return;
 
-        _transaction ??= await _db.Database.BeginTransactionAsync(Options.IsolationLevel, cancellationToken);
-
         try
         {
-            await _db.SaveChangesAsync(cancellationToken);
-            await _transaction.CommitAsync(cancellationToken);
+            await SaveChangesUntilCleanAsync(cancellationToken);
+
+            if (_transaction is not null)
+            {
+                await _transaction.CommitAsync(cancellationToken);
+            }
+
             IsCompleted = true;
             _logger.LogDebug("UoW {UoWId} committed", Id);
         }
         catch
         {
-            await SafeRollbackAsync(cancellationToken);
+            await SafeRollbackAsync(CancellationToken.None);
             throw;
         }
 
-        // Fire post-commit callbacks (integration event publishing happens here).
-        foreach (var cb in _onCompleted)
+        foreach (var callback in _onCompleted)
         {
-            try { await cb(cancellationToken); }
+            try { await callback(cancellationToken); }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Post-commit callback failed for UoW {UoWId}", Id);
@@ -75,17 +108,10 @@ public sealed class EfCoreUnitOfWork<TDbContext> : IUnitOfWork
 
     public async Task RollbackAsync(CancellationToken cancellationToken = default)
     {
+        if (IsCompleted || IsRolledBack) return;
+
         await SafeRollbackAsync(cancellationToken);
         IsRolledBack = true;
-    }
-
-    private async Task SafeRollbackAsync(CancellationToken cancellationToken)
-    {
-        if (_transaction is not null)
-        {
-            try { await _transaction.RollbackAsync(cancellationToken); }
-            catch (Exception ex) { _logger.LogWarning(ex, "Rollback failed for UoW {UoWId}", Id); }
-        }
     }
 
     public async ValueTask DisposeAsync()
@@ -93,25 +119,83 @@ public sealed class EfCoreUnitOfWork<TDbContext> : IUnitOfWork
         if (_disposed) return;
         _disposed = true;
 
+        if (!IsCompleted && !IsRolledBack)
+        {
+            await SafeRollbackAsync(CancellationToken.None);
+        }
+
+        ClearEnlistedTransactions();
+
         if (_transaction is not null)
+        {
             await _transaction.DisposeAsync();
+        }
 
         _accessor.Pop(this);
     }
-}
 
-public sealed class EfCoreUnitOfWorkFactory<TDbContext> : IUnitOfWorkFactory
-    where TDbContext : DbContext
-{
-    private readonly IServiceProvider _serviceProvider;
-
-    public EfCoreUnitOfWorkFactory(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
-
-    public IUnitOfWork Create(UnitOfWorkOptions options, AmbientUnitOfWorkAccessor accessor, IUnitOfWork? outer)
+    private void BeginTransaction()
     {
-        var db = (TDbContext)_serviceProvider.GetService(typeof(TDbContext))!;
-        var logger = (ILogger<EfCoreUnitOfWork<TDbContext>>)
-            _serviceProvider.GetService(typeof(ILogger<EfCoreUnitOfWork<TDbContext>>))!;
-        return new EfCoreUnitOfWork<TDbContext>(db, options, accessor, outer, logger);
+        if (_contexts.Count == 0) return;
+
+        _transaction = _contexts[0].Database.BeginTransaction(Options.IsolationLevel);
+        var dbTransaction = _transaction.GetDbTransaction();
+
+        for (var i = 1; i < _contexts.Count; i++)
+        {
+            _contexts[i].Database.UseTransaction(dbTransaction);
+        }
     }
+
+    private async Task BeginTransactionAsync(CancellationToken cancellationToken)
+    {
+        if (_contexts.Count == 0) return;
+
+        _transaction = await _contexts[0].Database.BeginTransactionAsync(Options.IsolationLevel, cancellationToken);
+        var dbTransaction = _transaction.GetDbTransaction();
+
+        for (var i = 1; i < _contexts.Count; i++)
+        {
+            await _contexts[i].Database.UseTransactionAsync(dbTransaction, cancellationToken);
+        }
+    }
+
+    private async Task SaveChangesUntilCleanAsync(CancellationToken cancellationToken)
+    {
+        for (var pass = 0; pass < MaxSavePasses; pass++)
+        {
+            var savedAny = false;
+
+            foreach (var committer in _committers)
+            {
+                if (!committer.HasChanges()) continue;
+
+                await committer.SaveChangesAsync(cancellationToken);
+                savedAny = true;
+            }
+
+            if (!savedAny) return;
+        }
+
+        throw new InvalidOperationException("Unit of work still has pending changes after repeated save attempts.");
+    }
+
+    private async Task SafeRollbackAsync(CancellationToken cancellationToken)
+    {
+        if (_transaction is null) return;
+
+        try { await _transaction.RollbackAsync(cancellationToken); }
+        catch (Exception ex) { _logger.LogWarning(ex, "Rollback failed for UoW {UoWId}", Id); }
+    }
+
+    private void ClearEnlistedTransactions()
+    {
+        for (var i = 1; i < _contexts.Count; i++)
+        {
+            _contexts[i].Database.UseTransaction(null);
+        }
+    }
+
+    private static ModuleDbContext[] GetModuleContexts(IEnumerable<IUnitOfWorkCommitter> committers) =>
+        committers.OfType<ModuleDbContext>().Distinct().ToArray();
 }

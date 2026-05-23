@@ -23,6 +23,13 @@ public sealed class UnitOfWorkManager : IUnitOfWorkManager
 
     public IUnitOfWork Begin(UnitOfWorkOptions? options = null)
     {
+        return BeginAsync(options).GetAwaiter().GetResult();
+    }
+
+    public async Task<IUnitOfWork> BeginAsync(
+        UnitOfWorkOptions? options = null,
+        CancellationToken cancellationToken = default)
+    {
         options ??= new UnitOfWorkOptions();
         var outer = _accessor.Current;
 
@@ -34,7 +41,7 @@ public sealed class UnitOfWorkManager : IUnitOfWorkManager
         }
 
         var factory = _serviceProvider.GetRequiredService<IUnitOfWorkFactory>();
-        var root = factory.Create(options, _accessor, outer);
+        var root = await factory.CreateAsync(options, _accessor, outer, cancellationToken);
         _accessor.Push(root);
         return root;
     }
@@ -47,4 +54,9 @@ public sealed class UnitOfWorkManager : IUnitOfWorkManager
 public interface IUnitOfWorkFactory
 {
     IUnitOfWork Create(UnitOfWorkOptions options, AmbientUnitOfWorkAccessor accessor, IUnitOfWork? outer);
+    Task<IUnitOfWork> CreateAsync(
+        UnitOfWorkOptions options,
+        AmbientUnitOfWorkAccessor accessor,
+        IUnitOfWork? outer,
+        CancellationToken cancellationToken = default);
 }

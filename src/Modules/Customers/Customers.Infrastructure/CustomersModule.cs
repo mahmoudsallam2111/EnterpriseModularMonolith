@@ -3,6 +3,7 @@ using BuildingBlocks.Application.Modules;
 using BuildingBlocks.Application.UnitOfWork;
 using BuildingBlocks.EventBus;
 using BuildingBlocks.Infrastructure.Outbox;
+using BuildingBlocks.Infrastructure.Persistence;
 using BuildingBlocks.Infrastructure.Persistence.Interceptors;
 using Customers.Application;
 using Customers.Application.Customers.Queries;
@@ -31,15 +32,14 @@ public sealed class CustomersModule : IModule
 
     public void AddServices(IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("Postgres")
-            ?? throw new InvalidOperationException("Missing connection string 'Postgres'.");
-
         services.AddScoped<OutboxAccumulator>();
         services.AddScoped<IIntegrationEventQueue>(sp => sp.GetRequiredService<OutboxAccumulator>());
 
         services.AddDbContext<CustomersDbContext>((sp, options) =>
         {
-            options.UseNpgsql(connectionString, npg =>
+            var connection = sp.GetRequiredService<SharedModuleDbConnection>().Connection;
+
+            options.UseNpgsql(connection, npg =>
             {
                 npg.MigrationsHistoryTable("__ef_migrations_history", CustomersDbContext.SchemaName);
                 npg.MigrationsAssembly(typeof(CustomersDbContext).Assembly.FullName);
