@@ -1,4 +1,5 @@
 using BuildingBlocks.Infrastructure.Persistence.Repositories;
+using Orders.Application.Orders.Queries;
 using Orders.Domain.Orders;
 
 namespace Orders.Infrastructure.Persistence.Queries;
