@@ -16,16 +16,10 @@ using BuildingBlocks.Infrastructure.Redis;
 using BuildingBlocks.SharedKernel;
 using BuildingBlocks.SharedKernel.DependencyInjection;
 using BuildingBlocks.UnitOfWork;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.FeatureManagement;
 
 namespace EnterpriseModularMonolith.Api.Composition;
 
-/// <summary>
-/// Single place that wires every cross-cutting concern that all modules depend on:
-/// clock, current user, caching, feature flags, distributed locking, event bus, etc.
-/// </summary>
 internal static class InfrastructureBootstrap
 {
     private const string InMemoryProvider = "InMemory";

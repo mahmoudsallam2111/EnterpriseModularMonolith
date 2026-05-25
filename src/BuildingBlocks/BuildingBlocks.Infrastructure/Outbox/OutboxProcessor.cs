@@ -11,7 +11,7 @@ namespace BuildingBlocks.Infrastructure.Outbox;
 
 /// <summary>
 /// Background drain for a single module's Outbox table. Reads unpublished messages,
-/// deserialises them, calls the integration event bus, and marks them processed.
+/// deserializes them, calls the integration event bus, and marks them processed.
 /// Idempotent at the consumer side via the Inbox table.
 /// </summary>
 public sealed class OutboxProcessor<TDbContext> : BackgroundService

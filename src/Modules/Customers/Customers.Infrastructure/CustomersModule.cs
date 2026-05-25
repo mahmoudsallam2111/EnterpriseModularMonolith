@@ -71,6 +71,6 @@ public sealed class CustomersModule : IModule
             typeof(CustomersModule).Assembly);
 
         // Outbox drain
-        services.AddHostedService<BuildingBlocks.Infrastructure.Outbox.OutboxProcessor<CustomersDbContext>>();
+        services.AddHostedService<OutboxProcessor<CustomersDbContext>>();
     }
 }
