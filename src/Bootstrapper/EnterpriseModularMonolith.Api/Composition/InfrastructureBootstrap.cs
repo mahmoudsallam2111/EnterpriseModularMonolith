@@ -12,6 +12,7 @@ using BuildingBlocks.Infrastructure.Caching;
 using BuildingBlocks.Infrastructure.FeatureFlags;
 using BuildingBlocks.Infrastructure.Locking;
 using BuildingBlocks.MultiTenancy;
+using BuildingBlocks.Infrastructure.Redis;
 using BuildingBlocks.SharedKernel;
 using BuildingBlocks.UnitOfWork;
 using Microsoft.Extensions.Configuration;
@@ -26,6 +27,9 @@ namespace EnterpriseModularMonolith.Api.Composition;
 /// </summary>
 internal static class InfrastructureBootstrap
 {
+    private const string InMemoryProvider = "InMemory";
+    private const string RedisProvider = "Redis";
+
     public static IServiceCollection AddPlatform(this IServiceCollection services, IConfiguration configuration)
     {
         // Core platform primitives
@@ -35,16 +39,13 @@ internal static class InfrastructureBootstrap
         services.AddScoped<BuildingBlocks.Application.Authorization.IPermissionService, DummyPermissionService>();
         services.AddSingleton<ITenantContext, NullTenantContext>();
 
-        // Caching
-        services.AddMemoryCache();
-        services.AddScoped<ICacheService, InMemoryCacheService>();
+        services.AddConfiguredCache(configuration);
 
         // Feature flags
         services.AddFeatureManagement();
         services.AddScoped<IFeatureFlags, MicrosoftFeatureFlags>();
 
-        // Distributed lock (in-process default)
-        services.AddSingleton<IDistributedLock, InMemoryDistributedLock>();
+        services.AddConfiguredDistributedLock(configuration);
 
         // Auditing
         services.AddScoped<IAuditLogger, LoggerAuditLogger>();
@@ -62,4 +63,63 @@ internal static class InfrastructureBootstrap
 
         return services;
     }
+
+    private static IServiceCollection AddConfiguredCache(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        var provider = configuration["Platform:Cache:Provider"] ?? InMemoryProvider;
+
+        if (IsProvider(provider, InMemoryProvider))
+        {
+            services.AddMemoryCache();
+            services.AddScoped<ICacheService, InMemoryCacheService>();
+            return services;
+        }
+
+        if (IsProvider(provider, RedisProvider))
+        {
+            services.AddRedisCacheService(
+                GetRequiredRedisConnectionString(configuration),
+                configuration["Platform:Cache:Redis:KeyPrefix"] ?? "emm:cache:");
+            return services;
+        }
+
+        throw new InvalidOperationException(
+            $"Unsupported cache provider '{provider}'. Supported providers: {InMemoryProvider}, {RedisProvider}.");
+    }
+
+    private static IServiceCollection AddConfiguredDistributedLock(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        var provider = configuration["Platform:DistributedLock:Provider"] ?? InMemoryProvider;
+
+        if (IsProvider(provider, InMemoryProvider))
+        {
+            services.AddSingleton<IDistributedLock, InMemoryDistributedLock>();
+            return services;
+        }
+
+        if (IsProvider(provider, RedisProvider))
+        {
+            services.AddRedisDistributedLock(
+                GetRequiredRedisConnectionString(configuration),
+                configuration["Platform:DistributedLock:Redis:KeyPrefix"] ?? "emm:locks:");
+            return services;
+        }
+
+        throw new InvalidOperationException(
+            $"Unsupported distributed lock provider '{provider}'. Supported providers: {InMemoryProvider}, {RedisProvider}.");
+    }
+
+    private static string GetRequiredRedisConnectionString(IConfiguration configuration) =>
+        configuration.GetConnectionString("Redis")
+        ?? configuration["Platform:Redis:ConnectionString"]
+        ?? configuration["Redis:ConnectionString"]
+        ?? throw new InvalidOperationException(
+            "Missing Redis connection string. Configure ConnectionStrings:Redis or Platform:Redis:ConnectionString.");
+
+    private static bool IsProvider(string value, string provider) =>
+        string.Equals(value, provider, StringComparison.OrdinalIgnoreCase);
 }

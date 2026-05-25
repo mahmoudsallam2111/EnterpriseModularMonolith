@@ -201,13 +201,42 @@ Every concern requested by the spec is wired up through a thin abstraction in Bu
 | Concern | Interface | Default implementation |
 |---|---|---|
 | Clock | `IClock` | `SystemClock` |
-| Caching | `ICacheService` | `InMemoryCacheService` (swap for Redis later) |
+| Caching | `ICacheService` | `InMemoryCacheService` or `RedisCacheService` via config |
 | Feature flags | `IFeatureFlags` | wraps Microsoft.FeatureManagement |
-| Distributed lock | `IDistributedLock` | `InMemoryDistributedLock` (swap for RedLock) |
+| Distributed lock | `IDistributedLock` | `InMemoryDistributedLock` or `RedisDistributedLock` via config |
 | Background jobs | `IBackgroundJobScheduler` | abstraction; plug in Quartz/Hangfire |
 | Audit logging | `IAuditLogger` | `LoggerAuditLogger` (Serilog → Seq) |
 | Multi-tenancy | `ITenantContext` | `NullTenantContext` — single-tenant default; flip to header/host resolver when needed |
 | Event bus | `IIntegrationEventBus` | `InProcessIntegrationEventBus`; outbox drain converts to a broker (RabbitMQ/Azure Service Bus) when you split the monolith |
+
+### Switching cache and lock providers
+
+The platform can run with local in-process defaults or Redis-backed providers without
+changing module code. Configure the provider names under `Platform`:
+
+```json
+{
+  "ConnectionStrings": {
+    "Redis": "localhost:6379"
+  },
+  "Platform": {
+    "Cache": {
+      "Provider": "Redis",
+      "Redis": {
+        "KeyPrefix": "emm:cache:"
+      }
+    },
+    "DistributedLock": {
+      "Provider": "Redis",
+      "Redis": {
+        "KeyPrefix": "emm:locks:"
+      }
+    }
+  }
+}
+```
+
+Use `InMemory` for either provider to keep the single-process development defaults.
 
 ---
 
