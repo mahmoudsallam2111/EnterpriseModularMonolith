@@ -290,7 +290,10 @@ Prerequisites:
 # Start dependencies
 docker compose up -d
 
-# Apply migrations + seed (the host does this on start when Migrations:RunOnStartup=true)
+# Apply EF migrations, seed data, and DbUp SQL scripts
+dotnet run --project src/Bootstrapper/EnterpriseModularMonolith.Migrator
+
+# Start the API
 dotnet run --project src/Bootstrapper/EnterpriseModularMonolith.Api
 
 # Browse
@@ -301,6 +304,30 @@ dotnet run --project src/Bootstrapper/EnterpriseModularMonolith.Api
 ```
 
 Seeded credentials: `admin / Admin#12345`.
+
+The standalone migrator is the production-friendly path. It applies each module's
+EF migrations, runs registered seeders, then executes embedded DbUp scripts from
+`src/Shared/EnterpriseModularMonolith.Shared.SqlScripts`.
+
+DbUp scripts are split into:
+- `Onetime/**/*.sql` — journaled by DbUp and executed once.
+- `Everytime/**/*.sql` — idempotent scripts such as schemas, views, functions, or procedures; these use a null journal and run on every migrator execution.
+
+Useful migrator switches:
+
+```bash
+# Preview pending EF migrations and DbUp scripts without changing the database
+dotnet run --project src/Bootstrapper/EnterpriseModularMonolith.Migrator -- --Migrator:DryRun=true
+
+# Run only DbUp scripts
+dotnet run --project src/Bootstrapper/EnterpriseModularMonolith.Migrator -- --Migrator:RunEfMigrations=false --Migrator:RunSeeders=false
+
+# Run only EF migrations
+dotnet run --project src/Bootstrapper/EnterpriseModularMonolith.Migrator -- --Migrator:RunSqlScripts=false
+```
+
+When deployment uses the migrator, set `Migrations:RunOnStartup=false` for the API
+so web startup stays fast and predictable.
 
 ```bash
 # Login

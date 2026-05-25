@@ -1,6 +1,7 @@
-﻿Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31903.59
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.6.11723.189 insiders
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildingBlocks", "BuildingBlocks", "{2CB71AC3-3BA7-53E5-A597-21D627609A18}"
 EndProject
@@ -79,6 +80,14 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventories.Contracts", "src\Modules\Inventories\Inventories.Contracts\Inventories.Contracts.csproj", "{4BBA13B2-30DC-4DFC-B0C8-C162D67B96AA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventories.IntegrationEvents", "src\Modules\Inventories\Inventories.IntegrationEvents\Inventories.IntegrationEvents.csproj", "{E4AD7AF5-F900-4725-B8E1-497A68AEF004}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{08909432-A698-44DD-B467-A9533E008E17}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{1231534F-CCF7-4987-B973-6563E9346605}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnterpriseModularMonolith.Shared.SqlScripts", "src\Shared\EnterpriseModularMonolith.Shared.SqlScripts\EnterpriseModularMonolith.Shared.SqlScripts.csproj", "{638B0B6E-6FE9-779D-4760-44823964D9D7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnterpriseModularMonolith.Migrator", "src\Bootstrapper\EnterpriseModularMonolith.Migrator\EnterpriseModularMonolith.Migrator.csproj", "{ECEC9E9B-E8EA-333E-31BF-1241C5A5B3AA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -214,13 +223,24 @@ Global
 		{E4AD7AF5-F900-4725-B8E1-497A68AEF004}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E4AD7AF5-F900-4725-B8E1-497A68AEF004}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E4AD7AF5-F900-4725-B8E1-497A68AEF004}.Release|Any CPU.Build.0 = Release|Any CPU
+		{638B0B6E-6FE9-779D-4760-44823964D9D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{638B0B6E-6FE9-779D-4760-44823964D9D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{638B0B6E-6FE9-779D-4760-44823964D9D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{638B0B6E-6FE9-779D-4760-44823964D9D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECEC9E9B-E8EA-333E-31BF-1241C5A5B3AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECEC9E9B-E8EA-333E-31BF-1241C5A5B3AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECEC9E9B-E8EA-333E-31BF-1241C5A5B3AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECEC9E9B-E8EA-333E-31BF-1241C5A5B3AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{2CB71AC3-3BA7-53E5-A597-21D627609A18} = {08909432-A698-44DD-B467-A9533E008E17}
+		{269A4010-3B40-5463-B7A9-4BD17A8C50C3} = {08909432-A698-44DD-B467-A9533E008E17}
 		{2306EAEC-252E-59F8-8A6B-291597905E5B} = {269A4010-3B40-5463-B7A9-4BD17A8C50C3}
 		{333F37C7-9DF8-5E0E-A645-B8E16EAF5CD7} = {269A4010-3B40-5463-B7A9-4BD17A8C50C3}
+		{1D3487AF-F9F4-506B-BC02-62CCD4EEBB90} = {08909432-A698-44DD-B467-A9533E008E17}
 		{501BA828-BFB0-53FF-8E92-9F717CAFA6B0} = {2CB71AC3-3BA7-53E5-A597-21D627609A18}
 		{9EAC980F-5D23-5A6D-B809-000E71C52313} = {2CB71AC3-3BA7-53E5-A597-21D627609A18}
 		{A3C090C3-1674-5C3B-9C34-B79B81113476} = {2CB71AC3-3BA7-53E5-A597-21D627609A18}
@@ -254,5 +274,11 @@ Global
 		{CCD5A130-A335-4E0A-8CE2-5A8198DD50B5} = {192F36F0-3203-4CB1-B8B3-C959065E5AD6}
 		{4BBA13B2-30DC-4DFC-B0C8-C162D67B96AA} = {192F36F0-3203-4CB1-B8B3-C959065E5AD6}
 		{E4AD7AF5-F900-4725-B8E1-497A68AEF004} = {192F36F0-3203-4CB1-B8B3-C959065E5AD6}
+		{1231534F-CCF7-4987-B973-6563E9346605} = {08909432-A698-44DD-B467-A9533E008E17}
+		{638B0B6E-6FE9-779D-4760-44823964D9D7} = {1231534F-CCF7-4987-B973-6563E9346605}
+		{ECEC9E9B-E8EA-333E-31BF-1241C5A5B3AA} = {1D3487AF-F9F4-506B-BC02-62CCD4EEBB90}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {99185E35-2395-4E04-9C54-F615A4EFB3C3}
 	EndGlobalSection
 EndGlobal

@@ -26,7 +26,7 @@ public sealed class RedisCacheService : ICacheService
         cancellationToken.ThrowIfCancellationRequested();
 
         return value.HasValue
-            ? JsonSerializer.Deserialize<T>(value!, JsonOptions)
+            ? JsonSerializer.Deserialize<T>(value.ToString(), JsonOptions)
             : default;
     }
 
