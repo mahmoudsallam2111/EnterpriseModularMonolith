@@ -1,3 +1,4 @@
+using BuildingBlocks.Auditing.Persistence;
 using BuildingBlocks.Infrastructure.Seeding;
 using Customers.Infrastructure.Persistence;
 using Customers.Infrastructure.Seeding;
@@ -12,7 +13,8 @@ internal static class MigrationsAndSeed
 {
     /// <summary>
     /// Applies pending EF migrations for every module's DbContext, then runs every
-    /// registered <see cref="IDataSeeder"/>.
+    /// registered <see cref="IDataSeeder"/>. The audit DB is migrated alongside —
+    /// it lives on its own connection so it must be migrated explicitly.
     /// </summary>
     public static async Task MigrateAndSeedAsync(this IServiceProvider services, CancellationToken cancellationToken = default)
     {
@@ -22,8 +24,9 @@ internal static class MigrationsAndSeed
         // Register seeders here (host owns wiring — modules just provide the classes).
         var customersDb = scope.ServiceProvider.GetRequiredService<CustomersDbContext>();
         var ordersDb = scope.ServiceProvider.GetRequiredService<OrdersDbContext>();
+        var auditDb = scope.ServiceProvider.GetRequiredService<AuditDbContext>();
 
-        foreach (var db in new DbContext[] { customersDb, ordersDb })
+        foreach (var db in new DbContext[] { customersDb, ordersDb, auditDb })
         {
             logger.LogInformation("Applying migrations for {Context}", db.GetType().Name);
             await db.Database.MigrateAsync(cancellationToken);

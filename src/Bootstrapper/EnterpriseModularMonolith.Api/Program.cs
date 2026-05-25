@@ -1,3 +1,5 @@
+using BuildingBlocks.Auditing;
+using BuildingBlocks.Auditing.Endpoints;
 using BuildingBlocks.Observability;
 using BuildingBlocks.Presentation.Middleware;
 using EnterpriseModularMonolith.Api.Composition;
@@ -25,6 +27,9 @@ try
     // ── Authentication / Authorization ──────────────────────────────────────
     builder.Services.AddPlatformAuthentication(builder.Configuration);
 
+    // ── Auditing (separate AuditDb, channel-backed writer) ─────────────────
+    builder.Services.AddAuditing(builder.Configuration);
+
     // ── Every business module composes its own services here ───────────────
     foreach (var module in ModuleRegistry.All)
         module.AddServices(builder.Services, builder.Configuration);
@@ -32,7 +37,8 @@ try
     // ── Health checks ───────────────────────────────────────────────────────
     builder.Services.AddHealthChecks()
         .AddDbContextCheck<Customers.Infrastructure.Persistence.CustomersDbContext>("customers-db")
-        .AddDbContextCheck<Orders.Infrastructure.Persistence.OrdersDbContext>("orders-db");
+        .AddDbContextCheck<Orders.Infrastructure.Persistence.OrdersDbContext>("orders-db")
+        .AddDbContextCheck<BuildingBlocks.Auditing.Persistence.AuditDbContext>("audit-db");
 
     // ── OpenAPI ─────────────────────────────────────────────────────────────
     builder.Services.AddEndpointsApiExplorer();
@@ -78,6 +84,11 @@ try
 
     app.UseAuthentication();
     app.UseAuthorization();
+
+    // Audit scope wraps the request AFTER auth so ICurrentUser is populated, but
+    // BEFORE the UoW middleware so commits happen inside the audit window.
+    app.UseAuditing();
+
     app.UseMiddleware<UnitOfWorkMiddleware>();
 
     // ── Endpoints ─────────────────────────────────────────────────────────
@@ -95,6 +106,7 @@ try
     });
 
     app.MapModuleEndpoints();
+    app.MapAuditEndpoints();
 
     if (app.Environment.IsDevelopment()) // for testing
     {

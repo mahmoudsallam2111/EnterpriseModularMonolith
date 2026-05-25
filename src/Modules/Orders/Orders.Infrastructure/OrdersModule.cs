@@ -1,5 +1,6 @@
 using BuildingBlocks.Application;
 using BuildingBlocks.Application.Modules;
+using BuildingBlocks.Auditing.Interceptors;
 using BuildingBlocks.EventBus;
 using BuildingBlocks.Infrastructure.Outbox;
 using BuildingBlocks.Infrastructure.Persistence.Interceptors;
@@ -45,7 +46,8 @@ public sealed class OrdersModule : IModule
             options.AddInterceptors(
                 sp.GetRequiredService<AuditingInterceptor>(),
                 sp.GetRequiredService<SoftDeleteInterceptor>(),
-                sp.GetRequiredService<OutboxInterceptor>());
+                sp.GetRequiredService<OutboxInterceptor>(),
+                sp.GetRequiredService<AuditCapturingInterceptor>());
         });
 
         services.TryAddScoped<AuditingInterceptor>();

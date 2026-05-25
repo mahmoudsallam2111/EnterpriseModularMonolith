@@ -8,8 +8,9 @@ namespace Customers.Domain.Customers;
 /// <summary>
 /// Customer aggregate root. Owns its email, name, addresses and lifecycle state.
 /// All state changes go through the methods on this class — there are no public setters.
+/// <see cref="IAuditedEntity"/> opts this aggregate into the property-level audit trail.
 /// </summary>
-public sealed class Customer : AggregateRoot<CustomerId>, IAuditableEntity, ISoftDeletable
+public sealed class Customer : AggregateRoot<CustomerId>, IAuditableEntity, ISoftDeletable, IAuditedEntity
 {
     private readonly List<Address> _addresses = [];
 

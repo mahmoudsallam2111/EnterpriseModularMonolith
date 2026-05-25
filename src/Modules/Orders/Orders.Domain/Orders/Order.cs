@@ -9,8 +9,9 @@ namespace Orders.Domain.Orders;
 /// <summary>
 /// Order aggregate root. Owns its lines, enforces state-machine transitions,
 /// and emits domain events on every meaningful transition.
+/// <see cref="IAuditedEntity"/> opts this aggregate into the property-level audit trail.
 /// </summary>
-public sealed class Order : AggregateRoot<OrderId>, IAuditableEntity
+public sealed class Order : AggregateRoot<OrderId>, IAuditableEntity, IAuditedEntity
 {
     private readonly List<OrderLine> _lines = [];
 
