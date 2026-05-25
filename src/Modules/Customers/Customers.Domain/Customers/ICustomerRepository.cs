@@ -6,7 +6,7 @@ namespace Customers.Domain.Customers;
 /// Domain-defined repository interface. The implementation lives in Customers.Infrastructure,
 /// but the abstraction belongs to the domain — that's the dependency inversion in action.
 /// </summary>
-public interface ICustomerRepository : IWriteRepository<Customer, CustomerId>
+public interface ICustomerRepository : IRepository<Customer, CustomerId>
 {
     Task<bool> ExistsByEmailAsync(Email email, CancellationToken cancellationToken = default);
 }

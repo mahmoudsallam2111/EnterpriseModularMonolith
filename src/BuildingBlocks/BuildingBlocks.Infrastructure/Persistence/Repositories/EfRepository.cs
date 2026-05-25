@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore;
 namespace BuildingBlocks.Infrastructure.Persistence.Repositories;
 
 /// <summary>
-/// Aggregate-oriented write repository. Tracking is enabled because changes will be
+/// Aggregate-oriented repository. Tracking is enabled because changes will be
 /// persisted via the ambient Unit of Work.
 /// </summary>
-public abstract class EfWriteRepository<TDbContext, TAggregate, TId> : IWriteRepository<TAggregate, TId>
+public abstract class EfRepository<TDbContext, TAggregate, TId> : IRepository<TAggregate, TId>
     where TDbContext : DbContext
     where TAggregate : AggregateRoot<TId>
     where TId : notnull
@@ -16,7 +16,7 @@ public abstract class EfWriteRepository<TDbContext, TAggregate, TId> : IWriteRep
     protected TDbContext Context { get; }
     protected DbSet<TAggregate> Set => Context.Set<TAggregate>();
 
-    protected EfWriteRepository(TDbContext context) => Context = context;
+    protected EfRepository(TDbContext context) => Context = context;
 
     public virtual Task<TAggregate?> GetByIdAsync(TId id, CancellationToken cancellationToken = default) =>
         Set.FirstOrDefaultAsync(a => a.Id.Equals(id), cancellationToken);

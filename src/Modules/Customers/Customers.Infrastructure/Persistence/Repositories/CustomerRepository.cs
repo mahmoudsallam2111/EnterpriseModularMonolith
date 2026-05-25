@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Customers.Infrastructure.Persistence.Repositories;
 
 internal sealed class CustomerRepository
-    : EfWriteRepository<CustomersDbContext, Customer, CustomerId>, ICustomerRepository
+    : EfRepository<CustomersDbContext, Customer, CustomerId>, ICustomerRepository
 {
     public CustomerRepository(CustomersDbContext context) : base(context) { }
 

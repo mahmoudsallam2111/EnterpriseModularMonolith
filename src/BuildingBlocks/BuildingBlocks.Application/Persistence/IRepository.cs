@@ -3,10 +3,10 @@ using BuildingBlocks.Domain;
 namespace BuildingBlocks.Application.Persistence;
 
 /// <summary>
-/// Write-side repository. Aggregate-oriented, tracked, used inside a Unit of Work.
-/// One repository per aggregate root — never one giant generic repository.
+/// Repository pattern for aggregates. Tracking is enabled by default.
+/// One repository per aggregate root.
 /// </summary>
-public interface IWriteRepository<TAggregate, TId>
+public interface IRepository<TAggregate, TId>
     where TAggregate : AggregateRoot<TId>
     where TId : notnull
 {

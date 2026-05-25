@@ -5,7 +5,7 @@ using Orders.Domain.Orders;
 namespace Orders.Infrastructure.Persistence.Repositories;
 
 internal sealed class OrderRepository
-    : EfWriteRepository<OrdersDbContext, Order, OrderId>, IOrderRepository
+    : EfRepository<OrdersDbContext, Order, OrderId>, IOrderRepository
 {
     public OrderRepository(OrdersDbContext context) : base(context) { }
 
