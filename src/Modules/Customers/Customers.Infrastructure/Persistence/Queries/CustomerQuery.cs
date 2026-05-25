@@ -1,5 +1,5 @@
 using BuildingBlocks.Infrastructure.Persistence.Repositories;
-using Customers.Application.Customers.Queries;
+using Customers.Application.Customers;
 using Customers.Domain.Customers;
 
 namespace Customers.Infrastructure.Persistence.Queries;
