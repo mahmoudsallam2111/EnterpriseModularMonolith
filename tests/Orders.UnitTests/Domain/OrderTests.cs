@@ -2,6 +2,7 @@ using BuildingBlocks.Domain;
 using FluentAssertions;
 using Orders.Domain.Orders;
 using Orders.Domain.Orders.Events;
+using Orders.Domain.Orders.ValueObjects;
 using Xunit;
 
 namespace Orders.UnitTests.Domain;

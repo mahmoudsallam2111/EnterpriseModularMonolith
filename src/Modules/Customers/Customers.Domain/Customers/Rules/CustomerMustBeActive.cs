@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain;
+using Customers.Domain.Customers.ValueObjects;
 
 namespace Customers.Domain.Customers.Rules;
 

@@ -1,6 +1,7 @@
 using BuildingBlocks.Domain;
+using Orders.Domain.Orders.ValueObjects;
 
-namespace Orders.Domain.Orders;
+namespace Orders.Domain.Orders.Entities;
 
 /// <summary>
 /// A line on an order. Belongs to <see cref="Order"/> — outside code cannot construct

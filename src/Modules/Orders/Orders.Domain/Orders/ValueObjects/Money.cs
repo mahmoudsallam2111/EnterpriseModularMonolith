@@ -1,6 +1,6 @@
 using BuildingBlocks.Domain;
 
-namespace Orders.Domain.Orders;
+namespace Orders.Domain.Orders.ValueObjects;
 
 /// <summary>
 /// Money value object — amount + currency. Arithmetic is currency-aware:

@@ -1,6 +1,7 @@
 using BuildingBlocks.Domain;
 using Customers.Domain.Customers.Events;
 using Customers.Domain.Customers.Rules;
+using Customers.Domain.Customers.ValueObjects;
 
 namespace Customers.Domain.Customers;
 

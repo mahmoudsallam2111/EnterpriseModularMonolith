@@ -3,9 +3,6 @@ using BuildingBlocks.Domain;
 
 namespace Customers.Domain.Customers;
 
-/// <summary>
-/// Email value object. Normalises to lower-case and validates with a basic RFC-ish regex.
-/// </summary>
 public sealed partial class Email : ValueObject
 {
     public string Value { get; }

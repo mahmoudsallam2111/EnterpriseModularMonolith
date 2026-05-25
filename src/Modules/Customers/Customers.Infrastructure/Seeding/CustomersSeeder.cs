@@ -1,5 +1,6 @@
 using BuildingBlocks.Infrastructure.Seeding;
 using Customers.Domain.Customers;
+using Customers.Domain.Customers.ValueObjects;
 using Customers.Infrastructure.Persistence;
 
 namespace Customers.Infrastructure.Seeding;

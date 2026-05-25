@@ -1,6 +1,8 @@
 using BuildingBlocks.Domain;
+using Orders.Domain.Orders.Entities;
 using Orders.Domain.Orders.Events;
 using Orders.Domain.Orders.Rules;
+using Orders.Domain.Orders.ValueObjects;
 
 namespace Orders.Domain.Orders;
 

@@ -2,6 +2,7 @@ using BuildingBlocks.Application.Cqrs;
 using BuildingBlocks.EventBus;
 using BuildingBlocks.SharedKernel;
 using Customers.Domain.Customers;
+using Customers.Domain.Customers.ValueObjects;
 using Customers.IntegrationEvents;
 
 namespace Customers.Application.Customers.Commands.RegisterCustomer;

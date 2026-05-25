@@ -1,6 +1,6 @@
 using BuildingBlocks.Domain;
 
-namespace Customers.Domain.Customers;
+namespace Customers.Domain.Customers.ValueObjects;
 
 public sealed class PersonName : ValueObject
 {

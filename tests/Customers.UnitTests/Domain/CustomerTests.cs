@@ -1,6 +1,7 @@
 using BuildingBlocks.Domain;
 using Customers.Domain.Customers;
 using Customers.Domain.Customers.Events;
+using Customers.Domain.Customers.ValueObjects;
 using FluentAssertions;
 using Xunit;
 
