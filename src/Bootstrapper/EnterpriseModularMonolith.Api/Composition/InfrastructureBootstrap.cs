@@ -14,6 +14,7 @@ using BuildingBlocks.Infrastructure.Locking;
 using BuildingBlocks.MultiTenancy;
 using BuildingBlocks.Infrastructure.Redis;
 using BuildingBlocks.SharedKernel;
+using BuildingBlocks.SharedKernel.DependencyInjection;
 using BuildingBlocks.UnitOfWork;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -58,8 +59,31 @@ internal static class InfrastructureBootstrap
         services.AddScoped<IUnitOfWorkFactory, EfCoreUnitOfWorkFactory>();
 
         // Event bus + dispatcher
-        services.AddScoped<IDomainEventDispatcher, MediatRDomainEventDispatcher>();
+        //services.AddScoped<IDomainEventDispatcher, MediatRDomainEventDispatcher>();
         services.AddScoped<IIntegrationEventBus, InProcessIntegrationEventBus>();
+
+        // Automatic Dependency Injection
+        services.AddAutomaticDependencyInjection();
+
+        return services;
+    }
+
+    private static IServiceCollection AddAutomaticDependencyInjection(this IServiceCollection services)
+    {
+        services.Scan(scan => scan
+            .FromApplicationDependencies()
+            .AddClasses(classes => classes.AssignableTo<ITransientDependency>())
+                .AsImplementedInterfaces()
+                .AsSelf()
+                .WithTransientLifetime()
+            .AddClasses(classes => classes.AssignableTo<IScopedDependency>())
+                .AsImplementedInterfaces()
+                .AsSelf()
+                .WithScopedLifetime()
+            .AddClasses(classes => classes.AssignableTo<ISingletonDependency>())
+                .AsImplementedInterfaces()
+                .AsSelf()
+                .WithSingletonLifetime());
 
         return services;
     }
