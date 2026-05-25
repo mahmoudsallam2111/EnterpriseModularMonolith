@@ -17,4 +17,8 @@
     <ProjectReference Include="..\Customers.IntegrationEvents\Customers.IntegrationEvents.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Dtos\" />
+  </ItemGroup>
+
 </Project>
