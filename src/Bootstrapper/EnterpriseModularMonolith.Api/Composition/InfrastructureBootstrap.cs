@@ -59,7 +59,7 @@ internal static class InfrastructureBootstrap
         services.AddScoped<IUnitOfWorkFactory, EfCoreUnitOfWorkFactory>();
 
         // Event bus + dispatcher
-        //services.AddScoped<IDomainEventDispatcher, MediatRDomainEventDispatcher>();
+        services.AddScoped<IDomainEventDispatcher, MediatRDomainEventDispatcher>();
         services.AddScoped<IIntegrationEventBus, InProcessIntegrationEventBus>();
 
         // Automatic Dependency Injection
