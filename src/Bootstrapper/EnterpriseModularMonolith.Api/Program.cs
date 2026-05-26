@@ -21,6 +21,8 @@ try
     var builder = WebApplication.CreateBuilder(args);
 
     builder.Host.UseEnterpriseSerilog();
+    builder.Services.Configure<HostOptions>(options =>
+        options.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.Ignore);
 
     // ── Platform-wide services ──────────────────────────────────────────────
     builder.Services.AddPlatform(builder.Configuration);
@@ -50,6 +52,7 @@ try
     builder.Services.AddSwaggerGen(o =>
     {
         o.SwaggerDoc("v1", new() { Title = "Enterprise Modular Monolith", Version = "v1" });
+        o.OperationFilter<FileUploadOperationFilter>();
         o.AddSecurityDefinition("Bearer", new()
         {
             Name = "Authorization",

@@ -8,6 +8,8 @@ using BuildingBlocks.FileStorage.Scanning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace BuildingBlocks.FileStorage;
 
@@ -40,24 +42,36 @@ public static class DependencyInjection
         // Scanner: NoOp default; replaceable.
         services.TryAddSingleton<IFileScanner, NoOpFileScanner>();
 
-        // Pick provider.
         var provider = configuration.GetSection(FileStorageOptions.SectionName)["Provider"] ?? "Local";
         switch (provider)
         {
             case "S3":
-                services.AddSingleton<IFileStore, S3FileStore>();
+                services.AddSingleton<S3FileStore>();
                 break;
             case "AzureBlob":
-                services.AddSingleton<IFileStore, AzureBlobFileStore>();
+                services.AddSingleton<AzureBlobFileStore>();
                 break;
             default:
-                services.AddSingleton<IFileStore, LocalFileStore>();
+                services.AddSingleton<LocalFileStore>();
                 break;
         }
 
-        // Orchestrator wraps the provider with validation + scanning.
-        services.AddSingleton<ValidatedFileStore>();
-        services.Decorate<IFileStore, ValidatedFileStore>();
+        services.AddSingleton<IFileStore>(sp =>
+        {
+            IFileStore inner = provider switch
+            {
+                "S3" => sp.GetRequiredService<S3FileStore>(),
+                "AzureBlob" => sp.GetRequiredService<AzureBlobFileStore>(),
+                _ => sp.GetRequiredService<LocalFileStore>()
+            };
+
+            return new ValidatedFileStore(
+                inner,
+                sp.GetServices<IFileValidator>(),
+                sp.GetRequiredService<IFileScanner>(),
+                sp.GetRequiredService<IOptions<FileStorageOptions>>(),
+                sp.GetRequiredService<ILogger<ValidatedFileStore>>());
+        });
 
         return services;
     }

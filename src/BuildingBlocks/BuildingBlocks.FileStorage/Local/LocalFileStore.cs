@@ -1,37 +1,32 @@
 using System.Collections.ObjectModel;
-using System.Text.Json;
 using BuildingBlocks.FileStorage.Abstractions;
 using BuildingBlocks.FileStorage.Hashing;
-using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Options;
 
 namespace BuildingBlocks.FileStorage.Local;
 
 /// <summary>
 /// Disk-backed file store. Each container becomes a subdirectory of
-/// <see cref="LocalFileStorageOptions.RootPath"/>; each object becomes a file
-/// plus a sidecar ".meta.json" carrying content-type and custom metadata.
+/// <see cref="LocalFileStorageOptions.RootPath"/>; each object becomes a regular file.
 /// Presigned URLs are HMAC-signed query strings that the FileEndpoints honour.
 /// </summary>
 public sealed class LocalFileStore : IFileStore
 {
     private readonly FileStorageOptions _options;
     private readonly PresignedUrlSigner _signer;
-    private readonly ILogger<LocalFileStore> _logger;
+    private static readonly FileExtensionContentTypeProvider ContentTypes = new();
 
-    private static readonly JsonSerializerOptions JsonOpts = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-
-    public LocalFileStore(IOptions<FileStorageOptions> options, PresignedUrlSigner signer, ILogger<LocalFileStore> logger)
+    public LocalFileStore(IOptions<FileStorageOptions> options, PresignedUrlSigner signer)
     {
         _options = options.Value;
         _signer = signer;
-        _logger = logger;
         Directory.CreateDirectory(_options.Local.RootPath);
     }
 
     public async Task<FileStorageResult> UploadAsync(string container, string objectKey, Stream content, FileMetadata metadata, CancellationToken cancellationToken = default)
     {
-        var (filePath, metaPath) = ResolvePaths(container, objectKey);
+        var filePath = ResolvePath(container, objectKey);
         Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
 
         var tmp = filePath + ".tmp";
@@ -45,12 +40,9 @@ public sealed class LocalFileStore : IFileStore
         if (File.Exists(filePath)) File.Delete(filePath);
         File.Move(tmp, filePath);
 
-        var meta = new SidecarMeta(
-            metadata.ContentType,
-            metadata.OriginalFileName,
-            metadata.CustomMetadata is null ? null : new Dictionary<string, string>(metadata.CustomMetadata),
-            DateTimeOffset.UtcNow);
-        await File.WriteAllTextAsync(metaPath, JsonSerializer.Serialize(meta, JsonOpts), cancellationToken);
+        var legacyMetaPath = GetLegacyMetaPath(filePath);
+        if (File.Exists(legacyMetaPath))
+            File.Delete(legacyMetaPath);
 
         var etag = ComputeEtag(filePath);
         return new FileStorageResult(container, objectKey, size, metadata.ContentType, etag);
@@ -58,49 +50,43 @@ public sealed class LocalFileStore : IFileStore
 
     public Task<Stream?> DownloadAsync(string container, string objectKey, CancellationToken cancellationToken = default)
     {
-        var (filePath, _) = ResolvePaths(container, objectKey);
+        var filePath = ResolvePath(container, objectKey);
         if (!File.Exists(filePath)) return Task.FromResult<Stream?>(null);
         Stream s = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, 81920, useAsync: true);
         return Task.FromResult<Stream?>(s);
     }
 
-    public async Task<FileStorageInfo?> GetInfoAsync(string container, string objectKey, CancellationToken cancellationToken = default)
+    public Task<FileStorageInfo?> GetInfoAsync(string container, string objectKey, CancellationToken cancellationToken = default)
     {
-        var (filePath, metaPath) = ResolvePaths(container, objectKey);
-        if (!File.Exists(filePath)) return null;
+        var filePath = ResolvePath(container, objectKey);
+        if (!File.Exists(filePath)) return Task.FromResult<FileStorageInfo?>(null);
         var fi = new FileInfo(filePath);
-        SidecarMeta? meta = null;
-        if (File.Exists(metaPath))
-        {
-            try
-            {
-                var json = await File.ReadAllTextAsync(metaPath, cancellationToken);
-                meta = JsonSerializer.Deserialize<SidecarMeta>(json, JsonOpts);
-            }
-            catch (Exception ex) { _logger.LogWarning(ex, "Failed to read sidecar {Meta}", metaPath); }
-        }
-        return new FileStorageInfo(
+
+        FileStorageInfo? info = new(
             container, objectKey,
             fi.Length,
-            meta?.ContentType ?? "application/octet-stream",
-            meta?.CreatedAtUtc ?? fi.CreationTimeUtc,
+            InferContentType(objectKey),
+            fi.CreationTimeUtc,
             fi.LastWriteTimeUtc,
             ComputeEtag(filePath),
-            meta?.CustomMetadata is null ? null : new ReadOnlyDictionary<string, string>(meta.CustomMetadata));
+            null);
+
+        return Task.FromResult<FileStorageInfo?>(info);
     }
 
     public Task<bool> ExistsAsync(string container, string objectKey, CancellationToken cancellationToken = default)
     {
-        var (filePath, _) = ResolvePaths(container, objectKey);
+        var filePath = ResolvePath(container, objectKey);
         return Task.FromResult(File.Exists(filePath));
     }
 
     public Task<bool> DeleteAsync(string container, string objectKey, CancellationToken cancellationToken = default)
     {
-        var (filePath, metaPath) = ResolvePaths(container, objectKey);
+        var filePath = ResolvePath(container, objectKey);
         if (!File.Exists(filePath)) return Task.FromResult(false);
         File.Delete(filePath);
-        if (File.Exists(metaPath)) File.Delete(metaPath);
+        var legacyMetaPath = GetLegacyMetaPath(filePath);
+        if (File.Exists(legacyMetaPath)) File.Delete(legacyMetaPath);
         return Task.FromResult(true);
     }
 
@@ -120,7 +106,7 @@ public sealed class LocalFileStore : IFileStore
             if (!string.IsNullOrEmpty(prefix) && !relative.StartsWith(prefix, StringComparison.Ordinal)) continue;
 
             var fi = new FileInfo(file);
-            infos.Add(new FileStorageInfo(container, relative, fi.Length, "application/octet-stream", fi.CreationTimeUtc, fi.LastWriteTimeUtc, ComputeEtag(file), null));
+            infos.Add(new FileStorageInfo(container, relative, fi.Length, InferContentType(relative), fi.CreationTimeUtc, fi.LastWriteTimeUtc, ComputeEtag(file), null));
             if (infos.Count >= maxResults) break;
         }
         return Task.FromResult<IReadOnlyList<FileStorageInfo>>(infos);
@@ -156,12 +142,11 @@ public sealed class LocalFileStore : IFileStore
         return new Uri($"{baseUrl}/{Uri.EscapeDataString(container)}/{Uri.EscapeDataString(objectKey)}");
     }
 
-    private (string FilePath, string MetaPath) ResolvePaths(string container, string objectKey)
+    private string ResolvePath(string container, string objectKey)
     {
         var safeContainer = SafeContainer(container);
         var safeKey = SafeObjectKey(objectKey);
-        var filePath = Path.Combine(_options.Local.RootPath, safeContainer, safeKey);
-        return (filePath, filePath + ".meta.json");
+        return Path.Combine(_options.Local.RootPath, safeContainer, safeKey);
     }
 
     private static string SafeContainer(string container)
@@ -186,9 +171,10 @@ public sealed class LocalFileStore : IFileStore
         return $"\"{fi.Length:x}-{fi.LastWriteTimeUtc.Ticks:x}\"";
     }
 
-    private sealed record SidecarMeta(
-        string ContentType,
-        string? OriginalFileName,
-        Dictionary<string, string>? CustomMetadata,
-        DateTimeOffset CreatedAtUtc);
+    private static string InferContentType(string objectKey) =>
+        ContentTypes.TryGetContentType(objectKey, out var contentType)
+            ? contentType
+            : "application/octet-stream";
+
+    private static string GetLegacyMetaPath(string filePath) => filePath + ".meta.json";
 }

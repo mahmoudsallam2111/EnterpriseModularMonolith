@@ -3,6 +3,7 @@ using BuildingBlocks.FileStorage.Hashing;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace BuildingBlocks.FileStorage.Endpoints;
@@ -25,6 +26,14 @@ public static class FileEndpoints
 
         group.MapGet("/{container}/{**objectKey}", DownloadAsync).WithName("DownloadFile");
         group.MapPut("/{container}/{**objectKey}", UploadAsync).WithName("UploadFile");
+
+        endpoints.MapGroup(prefix)
+            .WithTags("Files")
+            .RequireAuthorization()
+            .MapPost("/{container}/upload", UploadFormAsync)
+            .WithName("UploadFileFromSwagger")
+            .Produces<FileStorageResult>()
+            .DisableAntiforgery();
 
         return endpoints;
     }
@@ -62,6 +71,82 @@ public static class FileEndpoints
 
         var result = await store.UploadAsync(container, objectKey, request.Body, meta, cancellationToken);
         return Results.Ok(result);
+    }
+
+    private static async Task<IResult> UploadFormAsync(
+        string container,
+        HttpRequest request,
+        IFileStore store,
+        CancellationToken cancellationToken)
+    {
+        if (!request.HasFormContentType)
+            return Results.BadRequest(new { error = "Expected multipart/form-data." });
+
+        var form = await request.ReadFormAsync(cancellationToken);
+        var file = form.Files.GetFile("file") ?? (form.Files.Count > 0 ? form.Files[0] : null);
+        if (file is null)
+            return Results.BadRequest(new { error = "File is required." });
+
+        if (file.Length == 0)
+            return Results.BadRequest(new { error = "File is empty." });
+
+        var objectKey = form.TryGetValue("objectKey", out var values)
+            ? values.FirstOrDefault()
+            : null;
+
+        var originalFileName = Path.GetFileName(file.FileName);
+        var targetKey = ResolveTargetKey(objectKey, originalFileName);
+
+        if (string.IsNullOrWhiteSpace(targetKey))
+            return Results.BadRequest(new { error = "Object key is required when the uploaded file has no filename." });
+
+        try
+        {
+            await using var stream = file.OpenReadStream();
+            var metadata = new FileMetadata(
+                string.IsNullOrWhiteSpace(file.ContentType) ? "application/octet-stream" : file.ContentType,
+                originalFileName);
+
+            var result = await store.UploadAsync(container, targetKey, stream, metadata, cancellationToken);
+            return Results.Ok(result);
+        }
+        catch (FileStorageException ex)
+        {
+            return Results.BadRequest(new { error = ex.Code, message = ex.Message });
+        }
+        catch (IOException ex)
+        {
+            return Results.Problem(
+                title: "File upload failed.",
+                detail: ex.Message,
+                statusCode: StatusCodes.Status500InternalServerError);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Results.Problem(
+                title: "File upload path is not writable.",
+                detail: ex.Message,
+                statusCode: StatusCodes.Status500InternalServerError);
+        }
+    }
+
+    private static bool ShouldUseOriginalFileName(string? objectKey) =>
+        string.IsNullOrWhiteSpace(objectKey) ||
+        string.Equals(objectKey, "string", StringComparison.OrdinalIgnoreCase);
+
+    private static string ResolveTargetKey(string? objectKey, string originalFileName)
+    {
+        if (ShouldUseOriginalFileName(objectKey))
+            return originalFileName;
+
+        var targetKey = objectKey!.Replace('\\', '/');
+        if (targetKey.EndsWith('/'))
+            return targetKey + originalFileName;
+
+        var originalExtension = Path.GetExtension(originalFileName);
+        return string.IsNullOrWhiteSpace(originalExtension) || !string.IsNullOrWhiteSpace(Path.GetExtension(targetKey))
+            ? targetKey
+            : targetKey + originalExtension;
     }
 
     private static Microsoft.Net.Http.Headers.EntityTagHeaderValue? EntityTagFromETag(string? eTag) =>
