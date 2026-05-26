@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+
 namespace BuildingBlocks.Auditing.Abstractions;
 
 /// <summary>
@@ -30,7 +32,7 @@ public sealed class AuditScope
     public DateTimeOffset StartedAtUtc { get; set; } = DateTimeOffset.UtcNow;
     public int DurationMs { get; set; }
 
-    public List<PendingEntityChange> EntityChanges { get; } = [];
+    public Collection<PendingEntityChange> EntityChanges { get; } = [];
 }
 
 /// <summary>
@@ -44,7 +46,7 @@ public sealed class PendingEntityChange
     public string? Module { get; set; }
     public int ChangeType { get; set; }
     public DateTimeOffset ChangeTime { get; set; }
-    public List<PendingPropertyChange> Properties { get; } = [];
+    public Collection<PendingPropertyChange> Properties { get; } = [];
 }
 
 public sealed class PendingPropertyChange

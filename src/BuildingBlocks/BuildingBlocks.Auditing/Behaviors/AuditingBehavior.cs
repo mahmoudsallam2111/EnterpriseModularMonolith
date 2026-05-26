@@ -51,7 +51,7 @@ public sealed class AuditingBehavior<TRequest, TResponse> : IPipelineBehavior<TR
         var action = $"{(isCommand ? "Command" : "Query")}:{typeof(TRequest).Name}";
         var scope = _scopeAccessor.Push(action);
         scope.ServiceName = typeof(TRequest).FullName;
-        scope.MethodName = nameof(IRequestHandler<TRequest, TResponse>.Handle);
+        scope.MethodName = "Handle";
         scope.Parameters = ParameterSanitiser.ToJson(request, _options);
         scope.UserId = _currentUser.UserId;
         scope.UserName = _currentUser.UserName ?? (_currentUser.IsAuthenticated ? null : _options.AnonymousUserName);

@@ -1,4 +1,5 @@
 using BuildingBlocks.Application.Security;
+using BuildingBlocks.Auditing.Persistence;
 using BuildingBlocks.EventBus;
 using BuildingBlocks.Infrastructure.Persistence;
 using BuildingBlocks.Infrastructure.Persistence.Interceptors;
@@ -23,6 +24,8 @@ public static class MigratorServiceCollectionExtensions
     {
         var connectionString = configuration.GetConnectionString("Postgres")
             ?? throw new InvalidOperationException("Missing connection string 'Postgres'.");
+        var auditConnectionString = configuration.GetConnectionString("Audit")
+            ?? throw new InvalidOperationException("Missing connection string 'Audit'.");
 
         services.Configure<MigratorOptions>(configuration.GetSection("Migrator"));
 
@@ -63,6 +66,16 @@ public static class MigratorServiceCollectionExtensions
             options.AddInterceptors(
                 sp.GetRequiredService<AuditingInterceptor>(),
                 sp.GetRequiredService<SoftDeleteInterceptor>());
+        });
+
+        services.AddDbContext<AuditDbContext>(options =>
+        {
+            options.UseNpgsql(auditConnectionString, npg =>
+            {
+                npg.MigrationsHistoryTable("__ef_migrations_history", AuditDbContext.SchemaName);
+                npg.MigrationsAssembly(typeof(AuditDbContext).Assembly.FullName);
+            });
+            options.UseSnakeCaseNamingConvention();
         });
 
         services.AddScoped<IDataSeeder, CustomersSeeder>();

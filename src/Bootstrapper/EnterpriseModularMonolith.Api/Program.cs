@@ -120,6 +120,11 @@ try
     app.Run();
 }
 catch (Exception ex)
+    when (ex.GetType().FullName == "Microsoft.Extensions.Hosting.HostAbortedException")
+{
+    // EF Core design-time tooling intentionally aborts the host after service discovery.
+}
+catch (Exception ex)
 {
     Log.Fatal(ex, "Host terminated unexpectedly");
 }

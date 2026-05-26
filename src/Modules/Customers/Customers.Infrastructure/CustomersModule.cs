@@ -8,6 +8,7 @@ using BuildingBlocks.Infrastructure.Persistence;
 using BuildingBlocks.Infrastructure.Persistence.Interceptors;
 using Customers.Application;
 using Customers.Application.Customers.Queries;
+using Customers.Application.Customers.Queries.GetCustomer;
 using Customers.Contracts;
 using Customers.Domain.Customers;
 using Customers.Infrastructure.Persistence;

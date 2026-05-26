@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+
 namespace BuildingBlocks.Auditing.Entities;
 
 /// <summary>
@@ -36,5 +38,5 @@ public sealed class AuditLog
     /// <summary>Full exception message + stack when the operation failed. Null on success.</summary>
     public string? Exception { get; set; }
 
-    public List<EntityChange> EntityChanges { get; private set; } = [];
+    public Collection<EntityChange> EntityChanges { get; } = [];
 }

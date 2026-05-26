@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.SharedKernel\BuildingBlocks.SharedKernel.csproj" />
     <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
+    <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Auditing\BuildingBlocks.Auditing.csproj" />
     <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.EventBus\BuildingBlocks.EventBus.csproj" />
     <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
     <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.MultiTenancy\BuildingBlocks.MultiTenancy.csproj" />

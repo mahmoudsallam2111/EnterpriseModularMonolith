@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+
 namespace BuildingBlocks.Auditing.Entities;
 
 /// <summary>
@@ -23,5 +25,5 @@ public sealed class EntityChange
     /// <summary>Owning module ("Customers", "Orders", "Users"). Derived from the DbContext.</summary>
     public string? Module { get; set; }
 
-    public List<EntityPropertyChange> PropertyChanges { get; private set; } = [];
+    public Collection<EntityPropertyChange> PropertyChanges { get; } = [];
 }

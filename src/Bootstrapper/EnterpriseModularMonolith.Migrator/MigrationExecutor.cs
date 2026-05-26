@@ -1,3 +1,4 @@
+using BuildingBlocks.Auditing.Persistence;
 using BuildingBlocks.Infrastructure.Seeding;
 using EnterpriseModularMonolith.Shared.SqlScripts;
 using Customers.Infrastructure.Persistence;
@@ -15,6 +16,7 @@ public sealed class MigrationExecutor : IMigrationExecutor
     private readonly MigratorOptions _options;
     private readonly CustomersDbContext _customersDbContext;
     private readonly OrdersDbContext _ordersDbContext;
+    private readonly AuditDbContext _auditDbContext;
     private readonly IEnumerable<IDataSeeder> _seeders;
     private readonly IDatabaseScriptDeployer _scriptDeployer;
     private readonly ILogger<MigrationExecutor> _logger;
@@ -24,6 +26,7 @@ public sealed class MigrationExecutor : IMigrationExecutor
         IOptions<MigratorOptions> options,
         CustomersDbContext customersDbContext,
         OrdersDbContext ordersDbContext,
+        AuditDbContext auditDbContext,
         IEnumerable<IDataSeeder> seeders,
         IDatabaseScriptDeployer scriptDeployer,
         ILogger<MigrationExecutor> logger)
@@ -32,6 +35,7 @@ public sealed class MigrationExecutor : IMigrationExecutor
         _options = options.Value;
         _customersDbContext = customersDbContext;
         _ordersDbContext = ordersDbContext;
+        _auditDbContext = auditDbContext;
         _seeders = seeders;
         _scriptDeployer = scriptDeployer;
         _logger = logger;
@@ -48,6 +52,7 @@ public sealed class MigrationExecutor : IMigrationExecutor
         {
             await MigrateAsync("Customers", _customersDbContext, cancellationToken);
             await MigrateAsync("Orders", _ordersDbContext, cancellationToken);
+            await MigrateAsync("Audit", _auditDbContext, cancellationToken);
         }
         else
         {

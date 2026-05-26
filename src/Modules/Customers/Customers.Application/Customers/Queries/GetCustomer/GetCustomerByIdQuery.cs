@@ -26,3 +26,13 @@ internal sealed class GetCustomerByIdQueryHandler : IQueryHandler<GetCustomerByI
         return dto;
     }
 }
+
+public interface ICustomerReadModel
+{
+    Task<CustomerDetailsDto?> GetByIdAsync(Guid customerId, CancellationToken cancellationToken);
+    Task<PagedList<CustomerDetailsDto>> ListAsync(
+        string? search,
+        string? status,
+        PageRequest page,
+        CancellationToken cancellationToken);
+}

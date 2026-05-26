@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+
 namespace BuildingBlocks.Auditing.Abstractions;
 
 /// <summary>
@@ -39,14 +41,14 @@ public sealed class AuditingOptions
     public string RetentionCron { get; set; } = "0 15 3 * * ?";
 
     /// <summary>Property names matched case-insensitively that should be masked in parameter / value capture.</summary>
-    public List<string> SensitivePropertyNames { get; set; } =
+    public Collection<string> SensitivePropertyNames { get; } =
     [
         "password", "passwordhash", "token", "secret",
         "apikey", "signingkey", "authorization", "creditcard"
     ];
 
     /// <summary>Entity full type names to never audit even if they implement <see cref="IAuditedEntity"/>.</summary>
-    public List<string> ExcludedEntityTypes { get; set; } =
+    public Collection<string> ExcludedEntityTypes { get; } =
     [
         "BuildingBlocks.EventBus.Outbox.OutboxMessage",
         "BuildingBlocks.EventBus.Inbox.InboxMessage"

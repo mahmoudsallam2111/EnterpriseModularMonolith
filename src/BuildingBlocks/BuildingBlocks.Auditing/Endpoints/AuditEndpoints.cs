@@ -17,8 +17,7 @@ public static class AuditEndpoints
     {
         var group = endpoints.MapGroup("/api/v1/audit")
             .WithTags("Audit")
-            .RequireAuthorization()
-            .WithOpenApi();
+            .RequireAuthorization();
 
         group.MapGet("/logs", ListLogsAsync)
             .WithName("ListAuditLogs")
