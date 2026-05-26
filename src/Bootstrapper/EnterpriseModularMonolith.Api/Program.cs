@@ -1,5 +1,7 @@
 using BuildingBlocks.Auditing;
 using BuildingBlocks.Auditing.Endpoints;
+using BuildingBlocks.FileStorage;
+using BuildingBlocks.FileStorage.Endpoints;
 using BuildingBlocks.Observability;
 using BuildingBlocks.Presentation.Middleware;
 using EnterpriseModularMonolith.Api.Composition;
@@ -29,6 +31,9 @@ try
 
     // ── Auditing (separate AuditDb, channel-backed writer) ─────────────────
     builder.Services.AddAuditing(builder.Configuration);
+
+    // ── File storage (Local | S3 | AzureBlob — see "FileStorage:Provider") ─
+    builder.Services.AddFileStorage(builder.Configuration);
 
     // ── Every business module composes its own services here ───────────────
     foreach (var module in ModuleRegistry.All)
@@ -107,6 +112,7 @@ try
 
     app.MapModuleEndpoints();
     app.MapAuditEndpoints();
+    app.MapFileStorageEndpoints();
 
     if (app.Environment.IsDevelopment()) // for testing
     {

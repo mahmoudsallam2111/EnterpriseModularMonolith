@@ -91,6 +91,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnterpriseModularMonolith.M
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildingBlocks.Auditing", "src\BuildingBlocks\BuildingBlocks.Auditing\BuildingBlocks.Auditing.csproj", "{D66EC03C-A3FF-B491-381D-054E508EA66C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildingBlocks.FileStorage", "src\BuildingBlocks\BuildingBlocks.FileStorage\BuildingBlocks.FileStorage.csproj", "{18B1248C-B36A-08E4-7E6B-9FD0CBF749D5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -237,6 +239,10 @@ Global
 		{D66EC03C-A3FF-B491-381D-054E508EA66C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D66EC03C-A3FF-B491-381D-054E508EA66C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D66EC03C-A3FF-B491-381D-054E508EA66C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18B1248C-B36A-08E4-7E6B-9FD0CBF749D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18B1248C-B36A-08E4-7E6B-9FD0CBF749D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18B1248C-B36A-08E4-7E6B-9FD0CBF749D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18B1248C-B36A-08E4-7E6B-9FD0CBF749D5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -284,6 +290,7 @@ Global
 		{638B0B6E-6FE9-779D-4760-44823964D9D7} = {1231534F-CCF7-4987-B973-6563E9346605}
 		{ECEC9E9B-E8EA-333E-31BF-1241C5A5B3AA} = {1D3487AF-F9F4-506B-BC02-62CCD4EEBB90}
 		{D66EC03C-A3FF-B491-381D-054E508EA66C} = {2CB71AC3-3BA7-53E5-A597-21D627609A18}
+		{18B1248C-B36A-08E4-7E6B-9FD0CBF749D5} = {2CB71AC3-3BA7-53E5-A597-21D627609A18}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {99185E35-2395-4E04-9C54-F615A4EFB3C3}

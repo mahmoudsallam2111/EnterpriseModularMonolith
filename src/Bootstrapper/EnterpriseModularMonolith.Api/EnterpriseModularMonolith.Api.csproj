@@ -31,6 +31,7 @@
     <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Observability\BuildingBlocks.Observability.csproj" />
     <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Presentation\BuildingBlocks.Presentation.csproj" />
     <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Auditing\BuildingBlocks.Auditing.csproj" />
+    <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.FileStorage\BuildingBlocks.FileStorage.csproj" />
 
     <!-- Host references infrastructure + presentation of every module. -->
     <ProjectReference Include="..\..\Modules\Customers\Customers.Infrastructure\Customers.Infrastructure.csproj" />
