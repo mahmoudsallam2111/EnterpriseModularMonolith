@@ -1,5 +1,6 @@
 using BuildingBlocks.Application.Auditing;
 using BuildingBlocks.Application.Caching;
+using BuildingBlocks.Application.DataFiltering;
 using BuildingBlocks.Application.FeatureFlags;
 using BuildingBlocks.Application.Locking;
 using BuildingBlocks.Application.Security;
@@ -33,6 +34,10 @@ internal static class InfrastructureBootstrap
         services.AddScoped<ICurrentUser, HttpContextCurrentUser>();
         services.AddScoped<BuildingBlocks.Application.Authorization.IPermissionService, DummyPermissionService>();
         services.AddSingleton<ITenantContext, NullTenantContext>();
+
+        // ABP-style data filters (ISoftDeletable, IMultiTenantEntity, custom markers).
+        // Filters are enabled by default; toggle per-scope with IDataFilter.Disable<T>().
+        services.AddDataFiltering();
 
         services.AddConfiguredCache(configuration);
 

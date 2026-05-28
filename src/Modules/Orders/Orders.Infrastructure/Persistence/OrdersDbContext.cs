@@ -1,5 +1,7 @@
+using BuildingBlocks.Application.DataFiltering;
 using BuildingBlocks.EventBus;
 using BuildingBlocks.Infrastructure.Persistence;
+using BuildingBlocks.MultiTenancy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Orders.Domain.Orders;
@@ -16,12 +18,14 @@ public sealed class OrdersDbContext : ModuleDbContext
     public OrdersDbContext(
         DbContextOptions<OrdersDbContext> options,
         IDomainEventDispatcher domainEventDispatcher,
+        IDataFilter dataFilter,
+        ITenantContext tenantContext,
         ILogger<OrdersDbContext> logger)
-        : base(options, domainEventDispatcher, logger) { }
+        : base(options, domainEventDispatcher, dataFilter, tenantContext, logger) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(OrdersDbContext).Assembly);
+        base.OnModelCreating(modelBuilder);
     }
 }

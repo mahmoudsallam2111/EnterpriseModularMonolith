@@ -54,7 +54,8 @@ internal sealed class CustomerConfiguration : IEntityTypeConfiguration<Customer>
             a.Property(p => p.Country).HasMaxLength(100).IsRequired();
         });
 
-        b.HasQueryFilter(c => !c.IsDeleted);
+        // NOTE: no HasQueryFilter here — the global soft-delete / multi-tenant filters
+        // are applied automatically by ModuleDbContext based on the marker interfaces.
 
         b.Property(c => c.CreatedAt);
         b.Property(c => c.UpdatedAt);

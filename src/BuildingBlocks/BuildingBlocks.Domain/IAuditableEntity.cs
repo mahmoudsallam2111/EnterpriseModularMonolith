@@ -15,11 +15,22 @@ public interface IAuditableEntity
 
 /// <summary>
 /// Marker for entities that participate in soft delete. The SoftDeleteInterceptor
-/// converts EF Remove() into a flag flip; a global query filter hides them on reads.
+/// converts EF Remove() into a flag flip; ModuleDbContext auto-applies a global
+/// query filter (gated by IDataFilter&lt;ISoftDeletable&gt;) to hide them on reads.
 /// </summary>
 public interface ISoftDeletable
 {
     bool IsDeleted { get; set; }
     DateTimeOffset? DeletedAt { get; set; }
     Guid? DeletedBy { get; set; }
+}
+
+/// <summary>
+/// Marker for entities partitioned by tenant. The ModuleDbContext auto-applies a
+/// global query filter (gated by IDataFilter&lt;IMultiTenantEntity&gt;) that limits
+/// reads to the current tenant — and the auditing interceptor stamps TenantId on save.
+/// </summary>
+public interface IMultiTenantEntity
+{
+    Guid? TenantId { get; set; }
 }
