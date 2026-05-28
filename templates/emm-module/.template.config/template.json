@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "EnterpriseModularMonolith",
+  "classifications": [ "Modular Monolith", "DDD", "Module" ],
+  "identity": "EnterpriseModularMonolith.Module",
+  "name": "EMM Module (six-project layout)",
+  "shortName": "emm-module",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "EmmModule",
+  "preferNameDirectory": true,
+  "symbols": {
+    "Description": {
+      "type": "parameter",
+      "datatype": "string",
+      "replaces": "EMM_MODULE_DESCRIPTION",
+      "defaultValue": "Business module for the Enterprise Modular Monolith.",
+      "description": "Description for the module's csproj files."
+    },
+    "WithSample": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "true",
+      "description": "Include a sample aggregate + endpoint stub. Set to false for an empty skeleton."
+    }
+  },
+  "sources": [
+    {
+      "source": "./",
+      "target": "./",
+      "exclude": [
+        "README.md",
+        "pack.sh",
+        "pack.ps1",
+        "working/**"
+      ],
+      "modifiers": [
+        {
+          "condition": "(!WithSample)",
+          "exclude": [
+            "EmmModule.Domain/EmmModules/**",
+            "EmmModule.Application/EmmModules/**",
+            "EmmModule.Infrastructure/Persistence/Configurations/**",
+            "EmmModule.Infrastructure/Persistence/Repositories/**",
+            "EmmModule.Infrastructure/PublicApi/**",
+            "EmmModule.Contracts/IEmmModuleApi.cs",
+            "EmmModule.IntegrationEvents/EmmModuleSampleIntegrationEvent.cs",
+            "EmmModule.Presentation/EmmModuleEndpoints.cs"
+          ]
+        }
+      ]
+    }
+  ]
+}

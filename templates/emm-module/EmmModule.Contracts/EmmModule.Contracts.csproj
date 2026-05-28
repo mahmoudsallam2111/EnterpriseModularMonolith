@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>EMM_MODULE_DESCRIPTION (Contracts)</Description>
+  </PropertyGroup>
+</Project>
