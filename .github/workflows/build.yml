@@ -29,19 +29,19 @@ jobs:
       continue-on-error: true
       run: dotnet test EnterpriseModularMonolith.sln --no-build -c Release --verbosity normal --collect:"XPlat Code Coverage"
       
-    - name: Generate HTML Report
-      run: |
-        dotnet tool install -g dotnet-reportgenerator-globaltool
-        reportgenerator -reports:"**/TestResults/**/coverage.cobertura.xml" -targetdir:"coveragereport" -reporttypes:"Html"
+    # - name: Generate HTML Report
+    #   run: |
+    #     dotnet tool install -g dotnet-reportgenerator-globaltool
+    #     reportgenerator -reports:"**/TestResults/**/coverage.cobertura.xml" -targetdir:"coveragereport" -reporttypes:"Html"
 
-    - name: Report Coverage
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: coverage-report
-        path: |
-          **/TestResults/**/coverage.cobertura.xml
-          coveragereport/
+    # - name: Report Coverage
+    #   uses: actions/upload-artifact@v4
+    #   if: always()
+    #   with:
+    #     name: coverage-report
+    #     path: |
+    #       **/TestResults/**/coverage.cobertura.xml
+    #       coveragereport/
 
-    - name: Build Docker Image
-      run: docker build -t enterprisemodularmonolith/api:latest .
+    # - name: Build Docker Image
+    #   run: docker build -t enterprisemodularmonolith/api:latest .
