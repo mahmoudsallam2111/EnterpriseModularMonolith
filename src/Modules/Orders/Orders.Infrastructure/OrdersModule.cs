@@ -58,8 +58,6 @@ public sealed class OrdersModule : IModule
         services.AddScoped<IUnitOfWorkCommitter>(sp => sp.GetRequiredService<OrdersDbContext>());
 
         services.AddScoped<IOrderRepository, OrderRepository>();
-        services.AddScoped<IOrderReadModel, OrderReadModel>();
-        services.AddScoped<IOrderLookupForCustomer, OrderLookupForCustomer>();
         services.AddScoped<IOrdersApi, OrdersApi>();
 
         // Cross-module integration event subscription.

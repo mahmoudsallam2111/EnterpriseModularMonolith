@@ -4,10 +4,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BuildingBlocks.Infrastructure.Persistence.Repositories;
 
-/// <summary>
-/// Entity Framework implementation of IQueryBuilder.
-/// The default query is initialized with AsNoTracking().
-/// </summary>
 public class EfQueryBuilder<TDbContext, T> : IQueryBuilder<T> 
     where TDbContext : DbContext 
     where T : class
@@ -84,5 +80,15 @@ public class EfQueryBuilder<TDbContext, T> : IQueryBuilder<T>
     public Task<List<TResult>> SelectAsync<TResult>(Expression<Func<T, TResult>> selector, CancellationToken cancellationToken = default)
     {
         return _query.Select(selector).ToListAsync(cancellationToken);
+    }
+
+    public Task<TResult?> SelectFirstOrDefaultAsync<TResult>(Expression<Func<T, TResult>> selector, CancellationToken cancellationToken = default)
+    {
+        return _query.Select(selector).FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public Task<long> LongCountAsync(CancellationToken cancellationToken = default)
+    {
+        return _query.LongCountAsync(cancellationToken);
     }
 }

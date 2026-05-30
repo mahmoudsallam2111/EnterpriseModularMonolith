@@ -21,4 +21,6 @@ public interface IQueryBuilder<T> where T : class
     Task<bool> AnyAsync(CancellationToken cancellationToken = default);
     Task<int> CountAsync(CancellationToken cancellationToken = default);
     Task<List<TResult>> SelectAsync<TResult>(Expression<Func<T, TResult>> selector, CancellationToken cancellationToken = default);
+    Task<TResult?> SelectFirstOrDefaultAsync<TResult>(Expression<Func<T, TResult>> selector, CancellationToken cancellationToken = default);
+    Task<long> LongCountAsync(CancellationToken cancellationToken = default);
 }

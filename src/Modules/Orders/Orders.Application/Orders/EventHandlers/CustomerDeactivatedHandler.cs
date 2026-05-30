@@ -4,7 +4,6 @@ using Customers.IntegrationEvents;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Orders.Application.Orders.Commands.CancelOrder;
-using Orders.Application.Orders.Queries;
 
 namespace Orders.Application.Orders.EventHandlers;
 
@@ -15,22 +14,22 @@ namespace Orders.Application.Orders.EventHandlers;
 public sealed class CustomerDeactivatedHandler : IIntegrationEventHandler<CustomerDeactivatedIntegrationEvent>
 {
     private readonly ISender _mediator;
-    private readonly IOrderLookupForCustomer _lookup;
+    private readonly IOrderQuery _query;
     private readonly ILogger<CustomerDeactivatedHandler> _logger;
 
     public CustomerDeactivatedHandler(
         ISender mediator,
-        IOrderLookupForCustomer lookup,
+        IOrderQuery query,
         ILogger<CustomerDeactivatedHandler> logger)
     {
         _mediator = mediator;
-        _lookup = lookup;
+        _query = query;
         _logger = logger;
     }
 
     public async Task HandleAsync(CustomerDeactivatedIntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
-        var openOrders = await _lookup.GetOpenOrdersForCustomerAsync(integrationEvent.CustomerId, cancellationToken);
+        var openOrders = await _query.GetOpenOrderIdsForCustomerAsync(integrationEvent.CustomerId, cancellationToken);
         _logger.LogInformation(
             "Customer {CustomerId} deactivated; cancelling {Count} open order(s).",
             integrationEvent.CustomerId, openOrders.Count);
@@ -44,13 +43,4 @@ public sealed class CustomerDeactivatedHandler : IIntegrationEventHandler<Custom
                 _logger.LogWarning("Failed to cancel order {OrderId}: {Error}", orderId, result.Error);
         }
     }
-}
-
-/// <summary>
-/// Small read-side helper for the cross-module event handler.
-/// Implementation lives in Orders.Infrastructure.
-/// </summary>
-public interface IOrderLookupForCustomer
-{
-    Task<IReadOnlyList<Guid>> GetOpenOrdersForCustomerAsync(Guid customerId, CancellationToken cancellationToken);
 }

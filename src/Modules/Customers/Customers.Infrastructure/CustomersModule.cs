@@ -63,7 +63,6 @@ public sealed class CustomersModule : IModule
 
         // Repositories
         services.AddScoped<ICustomerRepository, CustomerRepository>();
-        services.AddScoped<ICustomerReadModel, CustomerReadModel>();
 
         // Public API surface for other modules
         services.AddScoped<ICustomersApi, CustomersApi>();
