@@ -1,6 +1,6 @@
 using BuildingBlocks.Domain;
 
-namespace BuildingBlocks.Application.Persistence;
+namespace BuildingBlocks.Domain.Persistence;
 
 /// <summary>
 /// Repository pattern for aggregates. Tracking is enabled by default.

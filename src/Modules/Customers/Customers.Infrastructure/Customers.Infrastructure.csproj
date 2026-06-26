@@ -13,13 +13,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
-    <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.UnitOfWork\BuildingBlocks.UnitOfWork.csproj" />
-    <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.EventBus\BuildingBlocks.EventBus.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Auditing\BuildingBlocks.Auditing.csproj" />
-    <ProjectReference Include="..\Customers.Domain\Customers.Domain.csproj" />
     <ProjectReference Include="..\Customers.Application\Customers.Application.csproj" />
     <ProjectReference Include="..\Customers.Contracts\Customers.Contracts.csproj" />
   </ItemGroup>

@@ -1,4 +1,4 @@
-using BuildingBlocks.Application.Persistence;
+using BuildingBlocks.Domain.Persistence;
 
 namespace Orders.Domain.Orders;
 

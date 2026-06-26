@@ -1,4 +1,4 @@
-using BuildingBlocks.Application.Persistence;
+using BuildingBlocks.Domain.Persistence;
 using BuildingBlocks.Domain;
 using Microsoft.EntityFrameworkCore;
 
