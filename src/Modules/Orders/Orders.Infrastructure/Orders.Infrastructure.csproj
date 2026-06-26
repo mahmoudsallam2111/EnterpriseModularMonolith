@@ -5,8 +5,6 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="EFCore.NamingConventions" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
@@ -19,8 +17,6 @@
     <ProjectReference Include="..\Orders.Application\Orders.Application.csproj" />
     <ProjectReference Include="..\Orders.Contracts\Orders.Contracts.csproj" />
     <!-- Orders consumes Customers ONLY through its Contracts assembly. -->
-    <ProjectReference Include="..\..\Customers\Customers.Contracts\Customers.Contracts.csproj" />
-    <ProjectReference Include="..\..\Customers\Customers.IntegrationEvents\Customers.IntegrationEvents.csproj" />
   </ItemGroup>
 
 </Project>
