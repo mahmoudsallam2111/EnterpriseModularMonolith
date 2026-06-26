@@ -1,5 +1,4 @@
 using System.Linq.Expressions;
-using System.Reflection;
 using BuildingBlocks.Application.DataFiltering;
 using BuildingBlocks.Application.UnitOfWork;
 using BuildingBlocks.Domain;
@@ -7,20 +6,10 @@ using BuildingBlocks.EventBus;
 using BuildingBlocks.EventBus.Outbox;
 using BuildingBlocks.MultiTenancy;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Logging;
 
 namespace BuildingBlocks.Infrastructure.Persistence;
 
-/// <summary>
-/// Base DbContext that every module derives from. Responsibilities:
-///  • per-module schema,
-///  • automatic global query filters for any entity implementing
-///    <see cref="ISoftDeletable"/> or <see cref="IMultiTenantEntity"/> — gated by
-///    <see cref="IDataFilter"/> so they can be toggled per-scope at runtime,
-///  • dispatch of domain events before commit,
-///  • outbox persistence inside the same transaction (via interceptor).
-/// </summary>
 public abstract class ModuleDbContext : DbContext, IUnitOfWorkCommitter
 {
     private readonly IDomainEventDispatcher _domainEventDispatcher;
@@ -33,17 +22,8 @@ public abstract class ModuleDbContext : DbContext, IUnitOfWorkCommitter
 
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 
-    /// <summary>
-    /// Read by the auto-applied global query filter. EF Core captures property access
-    /// on the DbContext as a parameter, re-reading it on every query — that's what
-    /// makes the filter togglable via <see cref="IDataFilter"/> without rebuilding the model.
-    /// </summary>
     protected bool IsSoftDeleteFilterEnabled => _dataFilter.IsEnabled<ISoftDeletable>();
-
-    /// <summary>Same trick for the tenant filter.</summary>
     protected bool IsMultiTenantFilterEnabled => _dataFilter.IsEnabled<IMultiTenantEntity>();
-
-    /// <summary>Tenant id used by the multi-tenant filter. Null when no tenant resolved.</summary>
     protected Guid? CurrentTenantId => _tenantContext.Current?.Id;
 
     protected ModuleDbContext(

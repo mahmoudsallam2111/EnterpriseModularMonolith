@@ -18,19 +18,11 @@ public interface IModule
     void AddServices(IServiceCollection services, IConfiguration configuration);
 }
 
-/// <summary>
-/// Modules that expose HTTP endpoints implement this interface so the host can
-/// invoke their endpoint mapping without taking a reference to the module assembly.
-/// </summary>
 public interface IEndpointModule : IModule
 {
     void MapEndpoints(IEndpointRouteBuilderAdapter endpoints);
 }
 
-/// <summary>
-/// Tiny adapter so module assemblies don't need a direct reference to
-/// Microsoft.AspNetCore.Http and can stay framework-light.
-/// </summary>
 public interface IEndpointRouteBuilderAdapter
 {
     object UnderlyingBuilder { get; }
