@@ -4,6 +4,8 @@ using Customers.Application.Customers.Commands.DeactivateCustomer;
 using Customers.Application.Customers.Commands.RegisterCustomer;
 using Customers.Application.Customers.Queries.GetCustomer;
 using Customers.Application.Customers.Queries.ListCustomers;
+using Customers.Application.Dtos;
+using BuildingBlocks.SharedKernel;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -11,11 +13,6 @@ using Microsoft.AspNetCore.Routing;
 
 namespace Customers.Presentation;
 
-/// <summary>
-/// Minimal API endpoints for the Customers module. Mounted by the host at /api/v1/customers.
-/// Endpoints are thin — they translate HTTP &lt;-&gt; commands/queries and rely on the MediatR
-/// pipeline for validation, authorization, tracing, and the unit of work.
-/// </summary>
 public sealed class CustomerEndpoints : IModuleEndpoints
 {
     public void Map(IEndpointRouteBuilder endpoints)
@@ -27,29 +24,34 @@ public sealed class CustomerEndpoints : IModuleEndpoints
 
         group.MapPost("/", RegisterAsync)
             .WithName("RegisterCustomer")
-            .WithSummary("Register a new customer.");
+            .WithSummary("Register a new customer.")
+            .Produces<RegisterResponse>(StatusCodes.Status201Created);
 
         group.MapGet("/{id:guid}", GetByIdAsync)
             .WithName("GetCustomerById")
-            .WithSummary("Get a customer by id.");
+            .WithSummary("Get a customer by id.")
+            .Produces<CustomerDetailsDto>(StatusCodes.Status200OK);
 
         group.MapGet("/", ListAsync)
-            .WithName("ListCustomers")
-            .WithSummary("List customers (paged, optional search/status filter).");
+            .WithName("Customers")
+            .WithSummary("List customers (paged, optional search/status filter).")
+            .Produces<PagedList<CustomerDetailsDto>>(StatusCodes.Status200OK);
 
         group.MapPatch("/{id:guid}/email", ChangeEmailAsync)
             .WithName("ChangeCustomerEmail")
-            .WithSummary("Change a customer's email.");
+            .WithSummary("Change a customer's email.")
+            .Produces(StatusCodes.Status204NoContent);
 
         group.MapPost("/{id:guid}/deactivate", DeactivateAsync)
             .WithName("DeactivateCustomer")
-            .WithSummary("Deactivate a customer.");
+            .WithSummary("Deactivate a customer.")
+            .Produces(StatusCodes.Status204NoContent);
     }
 
     private static async Task<IResult> RegisterAsync(
         RegisterCustomerCommand command, ISender mediator, CancellationToken cancellationToken) =>
         (await mediator.Send(command, cancellationToken))
-            .ToHttpResult(id => Results.Created($"/api/v1/customers/{id}", new { id }));
+            .ToHttpResult(id => Results.Created($"/api/v1/customers/{id}", new RegisterResponse(id)));
 
     private static async Task<IResult> GetByIdAsync(
         Guid id, ISender mediator, CancellationToken cancellationToken) =>
@@ -73,3 +75,4 @@ public sealed class CustomerEndpoints : IModuleEndpoints
 
 public sealed record ChangeEmailBody(string NewEmail);
 public sealed record DeactivateBody(string Reason);
+public sealed record RegisterResponse(Guid Id);

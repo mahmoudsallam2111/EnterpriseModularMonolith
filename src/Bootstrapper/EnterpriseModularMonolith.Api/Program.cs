@@ -28,6 +28,18 @@ try
     builder.Services.AddPlatform(builder.Configuration);
     builder.Services.AddEnterpriseTelemetry(builder.Configuration, serviceName: "EnterpriseModularMonolith");
 
+    // ── CORS for Angular dev server ──────────────────────────────────────────
+    builder.Services.AddCors(options =>
+    {
+        options.AddDefaultPolicy(policy =>
+        {
+            policy.WithOrigins("http://localhost:4200")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials();
+        });
+    });
+
     // ── Authentication / Authorization ──────────────────────────────────────
     builder.Services.AddPlatformAuthentication(builder.Configuration);
 
@@ -89,6 +101,8 @@ try
         app.UseSwagger();
         app.UseSwaggerUI();
     }
+
+    app.UseCors();
 
     app.UseAuthentication();
     app.UseAuthorization();

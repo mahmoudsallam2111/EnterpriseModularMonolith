@@ -32,6 +32,7 @@
     <PackageVersion Include="StackExchange.Redis" Version="2.9.17" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="7.0.0" />
     <PackageVersion Include="Scalar.AspNetCore" Version="1.2.55" />
+    <PackageVersion Include="NSwag.ApiDescription.Client" Version="14.2.0" />
   </ItemGroup>
 
   <ItemGroup Label="EF Core / Database">
